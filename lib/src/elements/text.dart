@@ -88,10 +88,7 @@ class Text extends Box {
     super.style,
     String? tagName,
     super.onRender,
-  }) : super(
-         text: text,
-         tagName: tagName ?? _variantToTag(variant),
-       );
+  }) : super(text: text, tagName: tagName ?? _variantToTag(variant));
 
   @override
   HTMLElement render({String? newId}) {
@@ -119,9 +116,8 @@ void useFont({
   // Set global font-family
   final style = document.createElement('style') as HTMLStyleElement;
   style.textContent = '''
-    html, body {
-      font-family: '$fontFamily', sans-serif;
-    }
+    * {
+      font-family: '$fontFamily', sans-serif !important;
   ''';
   head.append(style);
 }

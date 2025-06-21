@@ -25,8 +25,8 @@ class Button extends Box {
     final element = super.render();
     if (disabled) {
       element.setAttribute('disabled', 'true');
-      element.classList.add('btn-disabled');
     }
+
     if ((onPressed != null || onClick != null) && !disabled) {
       on(Event.click, (event) {
         if (onPressed != null) {

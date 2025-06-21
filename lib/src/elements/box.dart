@@ -113,7 +113,7 @@ abstract class Box {
   final String? text;
   final Function(Box)? onRender;
 
-  final List<EventHandler> _eventHandlers =  [];
+  final List<EventHandler> _eventHandlers = [];
   web.HTMLElement? _element;
 
   Box({
@@ -205,6 +205,7 @@ abstract class Box {
     final handlerIndex = _eventHandlers.indexWhere(
       (handler) => handler.event == event,
     );
+
     if (handlerIndex != -1) {
       _eventHandlers[handlerIndex].subscription.cancel();
       _eventHandlers.removeAt(handlerIndex);
