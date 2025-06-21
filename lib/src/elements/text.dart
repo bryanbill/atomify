@@ -116,8 +116,8 @@ void useFont({
   // Set global font-family
   final style = document.createElement('style') as HTMLStyleElement;
   style.textContent = '''
-    * {
-      font-family: '$fontFamily', sans-serif !important;
+    html, body {
+      font-family: '$fontFamily', sans-serif;
   ''';
   head.append(style);
 }
