@@ -5,7 +5,7 @@ import 'package:web/web.dart';
 class Page extends Box {
   List<Box> pages;
   int currentPageIndex;
-  final void Function(int)? onPageChange;
+  final void Function(int index, {Box? page})? onPageChange;
   final PageRef? ref;
 
   /// [id] is required here as it is used to identify the page in the DOM.
@@ -50,8 +50,7 @@ class Page extends Box {
 
     _element.appendChild(page.render());
 
-    onPageChange?.call(index);
-
+    onPageChange?.call(index, page: page);
     // set to page query parameter
     var uri = Uri.parse(Uri.base.toString());
     var otherQuery = uri.queryParametersAll;
