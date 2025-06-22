@@ -24,3 +24,4 @@ export './elements/page.dart';
 export './elements/tab.dart';
 export './elements/rail.dart';
 export './elements/idiomatic.dart';
+export './elements/progress.dart';
