@@ -1,5 +1,4 @@
 import 'package:ui/ui.dart';
-import 'package:web/web.dart';
 
 class Link extends Box {
   final Box child;

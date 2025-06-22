@@ -27,18 +27,13 @@ class Progress extends Box {
     this.ariaLabelledBy,
     this.ariaDescribedBy,
     this.fallback,
-    String? id,
-    String? className,
-    Style? style,
-    Map<String, String>? attributes,
-    Function(Box)? onRender,
+    super.id,
+    super.className,
+    super.style,
+    super.attributes,
+    super.onRender,
   }) : super(
          tagName: 'progress',
-         id: id,
-         className: className,
-         style: style,
-         attributes: attributes,
-         onRender: onRender,
        );
 
   @override

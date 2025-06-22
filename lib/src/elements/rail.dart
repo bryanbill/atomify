@@ -1,5 +1,4 @@
 import 'package:ui/ui.dart';
-import 'package:web/web.dart';
 
 enum RailAxis { horizontal, vertical }
 

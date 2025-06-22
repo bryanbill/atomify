@@ -1,5 +1,4 @@
 import 'package:ui/ui.dart';
-import 'package:web/web.dart';
 
 enum TabAxis { horizontal, vertical }
 
@@ -167,7 +166,6 @@ class Tab extends Box {
     return _element;
   }
 
- 
   // Default styles
   static final Style _defaultTabHeaderStyle = Style('tab-header', {
     Breakpoint.base: StyleBlock(

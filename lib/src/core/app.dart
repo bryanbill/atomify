@@ -1,5 +1,4 @@
 import 'package:ui/ui.dart';
-import 'package:web/web.dart';
 
 class App {
   final List<Box> children;
@@ -9,7 +8,9 @@ class App {
 
   App({
     required this.children,
+
     this.breakpoints,
+
     this.onRender,
     this.beforeRender,
   }) {
