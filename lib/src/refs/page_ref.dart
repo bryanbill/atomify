@@ -23,18 +23,22 @@ class PageRef extends Ref<Page> {
 
   void init(Page page) {
     current = page;
-    
-  }
-
-  void onPageChange(int index) {
-    if (current != null && current!.onPageChange != null) {
-      current!.onPageChange!(index);
-    }
   }
 
   void push(int index) {
     if (current != null) {
       current!.push(index);
+    }
+  }
+
+  void goTo(String id) {
+    if (current != null) {
+      var index = current!.pages.indexWhere((page) => page.id == id);
+      if (index != -1) {
+        current!.push(index);
+      } else {
+        throw ArgumentError('Page with id $id not found.');
+      }
     }
   }
 }
