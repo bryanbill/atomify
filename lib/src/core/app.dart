@@ -2,22 +2,10 @@ import 'package:ui/ui.dart';
 
 class App {
   final List<Box> children;
-  final Map<Breakpoint, String>? breakpoints;
   final Function(Box)? onRender;
   final void Function()? beforeRender;
 
-  App({
-    required this.children,
-
-    this.breakpoints,
-
-    this.onRender,
-    this.beforeRender,
-  }) {
-    if (breakpoints != null) {
-      Breakpoints.configure(breakpoints!);
-    }
-
+  App({required this.children, this.onRender, this.beforeRender}) {
     if (beforeRender != null) {
       beforeRender!();
     }

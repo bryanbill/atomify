@@ -9,6 +9,8 @@ environment:
 # Add regular dependencies here.
 dependencies:
   web: ^1.1.1
+  cssify:
+    git: ../cssify
 
 dev_dependencies:
   lints: ^5.0.0

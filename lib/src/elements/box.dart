@@ -105,7 +105,7 @@ class EventHandler {
 }
 
 abstract class Box {
-  final Style? style;
+  final String? style;
   final String? id;
   final String? className;
   final Map<String, String>? attributes;
@@ -146,12 +146,9 @@ abstract class Box {
     }
   }
 
-  set style(Style? value) {
+  set style(String? value) {
     if (value != null) {
-      style!.injectCss();
-      if (_element?.classList.contains(value.name) == false) {
-        _element?.classList.add(value.name);
-      }
+      _element?.style.cssText = value;
     }
   }
 
@@ -179,10 +176,7 @@ abstract class Box {
     });
     if (text != null) _element!.textContent = text;
     if (style != null) {
-      style!.injectCss();
-      if (_element!.classList.contains(style!.name) == false) {
-        _element!.classList.add(style!.name);
-      }
+      _element!.style.cssText = style!;
     }
     onRender?.call(this);
     return _element!;
