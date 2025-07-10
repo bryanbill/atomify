@@ -82,7 +82,7 @@ void main() {
           ),
           Button(
             Text('Increment'),
-            onClick: (e) => counterRef.value++,
+            onClick: (e) => counterRef.emit((counterRef.state ?? 0) + 1),
           ),
         ],
       ),
@@ -115,17 +115,38 @@ pageRef.goTo('about');
 Atomify integrates seamlessly with the `cssify` package for type-safe CSS:
 
 ```dart
+import 'package:atomify/atomify.dart';
+import 'package:cssify/cssify.dart';
+
+List<Cssify> styles = [
+    Cssify.create(".my-container", {
+        "base": {
+            "style": {
+                "background-color": "#f0f0f0",
+                "padding": "20px",
+                "border-radius": "8px",
+            },
+            "state": {
+                "hover": {
+                    "background-color": "#e0e0e0",
+                },
+            }
+        },
+        "md": {
+            "style": {
+                "padding": "30px",
+            }
+        },
+    })
+];
+
+useCss(styles);
 Container(
   className: 'my-container',
-  style: css({
-    'background-color': '#f0f0f0',
-    'padding': '20px',
-    'border-radius': '8px',
-  }),
   children: [
     Text('Styled content'),
   ],
-)
+);
 ```
 
 ## 📦 Available Elements
@@ -139,6 +160,37 @@ Atomify provides a rich set of atomic elements:
 - **Async**: `Async` (for handling Future data)
 - **Progress**: `Progress` indicators
 - **Reactive**: `Reactive` (for state-driven UI)
+
+## 🧩 Creating your own Box
+To create your own custom Box, simply extend the `Box` class and implement the `render` method:
+
+```dart
+import 'package:atomify/atomify.dart';
+
+class CustomBox extends Box {
+  // Pass child 
+  final Box? child;
+  ... // Define any properties you need
+  CustomBox({
+    this.child,
+    super.id,
+    super.className,
+    ... other properties,
+  }): super(tag: 'custom-box');
+
+  @override
+  HTMLElement render() {
+    final element = super.render();
+
+    if(child != null) {
+      element.append(child!.render());
+    }
+
+    return element;
+  }
+}
+
+
 
 ## 🏗️ Architecture
 
@@ -193,7 +245,6 @@ void main() {
           
           Reactive<List<String>>(
             ref: todoRef,
-            initialState: [],
             builder: (todos) => Container(
               className: 'todo-list',
               children: todos.map((todo) => 
@@ -207,7 +258,9 @@ void main() {
         ],
       ),
     ],
-  ).run();
+  ).run(target: "#root", beforeRender: (){
+    // Optional: Any setup before rendering
+  });
 }
 ```
 

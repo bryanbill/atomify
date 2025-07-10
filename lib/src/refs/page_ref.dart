@@ -7,7 +7,7 @@ class PageRef extends Ref<Page> {
     current = page;
   }
 
-  final StreamController<int>? _controller = StreamController<int>.broadcast();
+  final StreamController<int> _controller = StreamController<int>.broadcast();
 
   List<Box> get pages => current?.pages ?? [];
 
@@ -33,7 +33,7 @@ class PageRef extends Ref<Page> {
   void push(int index) {
     if (current != null) {
       current!.push(index);
-      _controller?.add(index);
+      _controller.add(index);
     }
   }
 
@@ -49,13 +49,13 @@ class PageRef extends Ref<Page> {
   }
 
   void onPageChange(void Function(int) callback) {
-    _controller?.stream.listen(callback);
+    _controller.stream.listen(callback);
   }
 
   @override
   void dispose() {
-    _controller?.close();
-    _controller?.stream.drain();
+    _controller.close();
+    _controller.stream.drain();
     current?.remove();
     current = null;
   }

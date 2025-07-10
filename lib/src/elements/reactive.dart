@@ -11,7 +11,9 @@ class Reactive<T> extends Box {
     super.style,
     super.attributes,
     super.onRender,
-  });
+  }) : super(tagName: 'div') {
+    assert(ref is ReactiveRef<T>, 'ref must be of type ReactiveRef<T>');
+  }
 
   @override
   render() {
