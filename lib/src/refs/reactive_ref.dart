@@ -10,15 +10,14 @@ class ReactiveRef<T> extends Ref {
 
   T? state;
 
-  ReactiveRef([Box? initialBox]) {
-    if (initialBox != null) {
-      current = initialBox;
+  ReactiveRef([T? initial]) {
+    if (initial != null) {
+      state = initial;
     }
   }
   @override
   void init(Box box) {
     current = box;
-    state = box is Reactive<T> ? box.initialState : null;
     _subscription?.cancel();
   }
 

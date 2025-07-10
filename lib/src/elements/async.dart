@@ -5,14 +5,14 @@ class Async<T> extends Box {
   final Future<T> Function() future;
 
   /// This function is called with the fetched data.
-  final void Function(T) then;
+  final Box Function(T) then;
 
   /// Initial box to render while the future is being resolved.
   /// This box will be removed once the future resolves.
   final Box? initialBox;
 
   /// This function is called if an error occurs during the fetch.
-  final void Function(Object)? onError;
+  final Box Function(Object)? onError;
 
   /// Creates an Async box that fetches data asynchronously.
   Async({
@@ -40,11 +40,16 @@ class Async<T> extends Box {
             initialBox!.remove();
           }
 
-          then(data);
+          var child = then(data).render();
+          element.append(child);
         })
         .catchError((error) {
           if (onError != null) {
-            onError!(error);
+            if (initialBox != null) {
+              initialBox!.remove();
+            }
+            var err = onError!(error).render();
+            element.append(err);
           } else {
             print('Error fetching data: $error');
           }

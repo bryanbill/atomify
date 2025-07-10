@@ -2,10 +2,9 @@ import 'package:atomify/atomify.dart';
 
 class Reactive<T> extends Box {
   final Box Function(T state) builder;
-  final T? initialState;
+
   Reactive({
     required this.builder,
-    this.initialState,
     required super.ref,
     super.id,
     super.className,
@@ -17,8 +16,9 @@ class Reactive<T> extends Box {
   @override
   render() {
     final element = super.render();
-    if (initialState != null) {
-      final initialBox = builder(initialState as T);
+    final ref = super.ref as ReactiveRef;
+    if (ref.state != null) {
+      final initialBox = builder(ref.state as T);
       element.append(initialBox.render());
     }
 
