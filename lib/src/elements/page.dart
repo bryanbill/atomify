@@ -1,5 +1,4 @@
 import 'package:atomify/src/elements/box.dart';
-import 'package:atomify/src/refs/page_ref.dart';
 import 'package:web/web.dart';
 
 class Page extends Box {
