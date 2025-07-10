@@ -1,4 +1,4 @@
-import 'package:ui/src/ui.dart';
+import 'package:atomify/src/atomify.dart';
 import 'package:web/web.dart' as web;
 
 class I extends Box {
@@ -26,6 +26,7 @@ class I extends Box {
     this.spellCheck,
     this.tabIndex,
     this.translate,
+    super.ref,
     super.id,
     super.className,
     super.attributes,

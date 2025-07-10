@@ -1,21 +1,18 @@
-import 'package:ui/ui.dart';
+import 'package:atomify/atomify.dart';
 
 class Reactive<T> extends Box {
-  final ReactiveRef ref;
   final Box Function(T state) builder;
   final T? initialState;
   Reactive({
-    required this.ref,
     required this.builder,
     this.initialState,
+    required super.ref,
     super.id,
     super.className,
     super.style,
     super.attributes,
     super.onRender,
-  }) : super(tagName: 'div') {
-    ref.init(this);
-  }
+  });
 
   @override
   render() {
@@ -25,10 +22,10 @@ class Reactive<T> extends Box {
       element.append(initialBox.render());
     }
 
-    ref.stream.listen((state) {
+    (super.ref as ReactiveRef).stream.listen((state) {
       final newBox = builder(state).render();
       final hashCode = newBox.hashCode;
-      if (hashCode == ref.current?.hashCode) {
+      if (hashCode == super.ref!.current.hashCode) {
         return; // No change, skip rendering
       }
 

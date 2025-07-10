@@ -1,4 +1,4 @@
-import 'package:ui/ui.dart';
+import 'package:atomify/atomify.dart';
 
 class Link extends Box {
   final Box child;
@@ -14,6 +14,7 @@ class Link extends Box {
     required this.href,
     this.target,
     this.rel,
+    super.ref,
     super.id,
     super.className,
     super.attributes,

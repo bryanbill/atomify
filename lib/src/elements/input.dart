@@ -1,4 +1,4 @@
-import 'package:ui/ui.dart';
+import 'package:atomify/atomify.dart';
 import 'package:web/web.dart' as web;
 
 class Input extends Box {
@@ -6,7 +6,7 @@ class Input extends Box {
   final String? placeholder;
   final String? type;
   final bool? disabled;
-  final InputRef? ref;
+
   final void Function(String)? onChanged;
   final void Function(web.Event)? onInput;
   final void Function(web.Event)? onFocus;
@@ -21,7 +21,7 @@ class Input extends Box {
     this.onInput,
     this.onFocus,
     this.onBlur,
-    this.ref,
+    super.ref,
     super.id,
     super.className,
     super.attributes,

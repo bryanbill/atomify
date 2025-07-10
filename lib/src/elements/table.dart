@@ -1,9 +1,10 @@
-import 'package:ui/src/ui.dart';
+import 'package:atomify/src/atomify.dart';
 
 class Table extends Box {
   final List<Box> children;
   Table({
     this.children = const [],
+    super.ref,
     super.id,
     super.className,
     super.style,

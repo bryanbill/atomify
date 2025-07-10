@@ -1,4 +1,4 @@
-import 'package:ui/ui.dart';
+import 'package:atomify/atomify.dart';
 import 'package:web/web.dart' as web;
 
 /// Implements the HTML <progress> element with all MDN and web standard attributes.
@@ -27,14 +27,13 @@ class Progress extends Box {
     this.ariaLabelledBy,
     this.ariaDescribedBy,
     this.fallback,
+    super.ref,
     super.id,
     super.className,
     super.style,
     super.attributes,
     super.onRender,
-  }) : super(
-         tagName: 'progress',
-       );
+  }) : super(tagName: 'progress');
 
   @override
   web.HTMLElement render({String? newId}) {

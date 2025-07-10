@@ -1,4 +1,4 @@
-import 'package:ui/src/elements/box.dart';
+import 'package:atomify/src/elements/box.dart';
 import 'package:web/web.dart';
 
 enum TextVariant {
@@ -82,6 +82,7 @@ class Text extends Box {
   Text(
     String text, {
     this.variant = TextVariant.p,
+    super.ref,
     super.id,
     super.className,
     super.attributes,

@@ -21,3 +21,5 @@ export './elements/page.dart';
 export './elements/idiomatic.dart';
 export './elements/progress.dart';
 export './elements/reactive.dart';
+export './elements/async.dart';
+export './elements/table.dart';

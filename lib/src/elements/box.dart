@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:ui/src/ui.dart';
+import 'package:atomify/src/atomify.dart';
 import 'package:web/web.dart' as web;
 
 enum Event {
@@ -105,6 +105,7 @@ class EventHandler {
 }
 
 abstract class Box {
+  final Ref? ref;
   final String? style;
   final String? id;
   final String? className;
@@ -117,6 +118,7 @@ abstract class Box {
   web.HTMLElement? _element;
 
   Box({
+    this.ref,
     this.style,
     this.id,
     this.className,
@@ -126,6 +128,9 @@ abstract class Box {
     this.onRender,
   }) {
     Stack.push(this);
+    if (ref != null) {
+      ref!.init(this);
+    }
   }
 
   set tagName(String? value) {

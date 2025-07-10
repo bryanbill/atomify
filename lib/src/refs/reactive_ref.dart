@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ui/ui.dart';
+import 'package:atomify/atomify.dart';
 
 class ReactiveRef<T> extends Ref {
   StreamSubscription? _subscription;
@@ -15,7 +15,7 @@ class ReactiveRef<T> extends Ref {
       current = initialBox;
     }
   }
-
+  @override
   void init(Box box) {
     current = box;
     state = box is Reactive<T> ? box.initialState : null;

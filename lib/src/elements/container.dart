@@ -1,4 +1,4 @@
-import 'package:ui/src/elements/box.dart';
+import 'package:atomify/src/elements/box.dart';
 import 'package:web/web.dart';
 
 class Container extends Box {
@@ -6,6 +6,7 @@ class Container extends Box {
 
   Container({
     required this.children,
+    super.ref,
     super.id,
     super.className,
     super.attributes,

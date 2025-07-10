@@ -1,4 +1,5 @@
-import 'package:ui/ui.dart';
+import 'package:atomify/atomify.dart';
+import 'package:web/web.dart' as web;
 
 /// InputRef allows programmatic access to an Input box.
 class InputRef extends Ref<Input> {
@@ -14,7 +15,27 @@ class InputRef extends Ref<Input> {
     }
   }
 
-  void init(Input input) {
-    current = input;
+  @override
+  void init(Input box) {
+    current = box;
+  }
+
+  /// Clears the input value.
+  void clear() {
+    if (current != null) {
+      current!.value = '';
+    }
+  }
+
+  /// Add an event listener to the input.
+  void on(Event event, void Function(web.Event) callback) {
+    current?.on(event, callback);
+  }
+
+  /// Removes the input from the DOM.
+  @override
+  void dispose() {
+    current?.remove();
+    current = null;
   }
 }

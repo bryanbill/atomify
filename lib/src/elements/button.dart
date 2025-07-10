@@ -1,4 +1,4 @@
-import 'package:ui/src/elements/box.dart';
+import 'package:atomify/src/elements/box.dart';
 import 'package:web/web.dart' as web;
 
 class Button extends Box {
@@ -12,6 +12,7 @@ class Button extends Box {
     this.disabled = false,
     this.onClick,
     this.onPressed,
+    super.ref,
     super.id,
     super.className,
     super.attributes,

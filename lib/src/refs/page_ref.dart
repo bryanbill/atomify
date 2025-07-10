@@ -1,9 +1,13 @@
-import 'package:ui/src/ui.dart';
+import 'dart:async';
+
+import 'package:atomify/src/atomify.dart';
 
 class PageRef extends Ref<Page> {
   PageRef([Page? page]) {
     current = page;
   }
+
+  final StreamController<int>? _controller = StreamController<int>.broadcast();
 
   List<Box> get pages => current?.pages ?? [];
 
@@ -21,13 +25,15 @@ class PageRef extends Ref<Page> {
     }
   }
 
-  void init(Page page) {
-    current = page;
+  @override
+  void init(Page box) {
+    current = box;
   }
 
   void push(int index) {
     if (current != null) {
       current!.push(index);
+      _controller?.add(index);
     }
   }
 
@@ -40,5 +46,17 @@ class PageRef extends Ref<Page> {
         throw ArgumentError('Page with id $id not found.');
       }
     }
+  }
+
+  void onPageChange(void Function(int) callback) {
+    _controller?.stream.listen(callback);
+  }
+
+  @override
+  void dispose() {
+    _controller?.close();
+    _controller?.stream.drain();
+    current?.remove();
+    current = null;
   }
 }

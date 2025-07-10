@@ -1,4 +1,4 @@
-import 'package:ui/ui.dart';
+import 'package:atomify/atomify.dart';
 
 class App {
   final List<Box> children;

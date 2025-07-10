@@ -1,4 +1,4 @@
-import 'package:ui/src/elements/box.dart';
+import 'package:atomify/src/elements/box.dart';
 
 abstract class State {
   final Box box;

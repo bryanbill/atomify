@@ -1,19 +1,18 @@
-import 'package:ui/src/elements/box.dart';
-import 'package:ui/src/refs/page_ref.dart';
+import 'package:atomify/src/elements/box.dart';
+import 'package:atomify/src/refs/page_ref.dart';
 import 'package:web/web.dart';
 
 class Page extends Box {
   List<Box> pages;
   int currentPageIndex;
   final void Function(int index, {Box? page})? onPageChange;
-  final PageRef? ref;
 
   /// [id] is required here as it is used to identify the page in the DOM.
   Page({
     this.pages = const [],
     this.currentPageIndex = 0,
     this.onPageChange,
-    this.ref,
+    super.ref,
     required super.id,
     super.className,
     super.attributes,
