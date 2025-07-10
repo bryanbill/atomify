@@ -4,6 +4,9 @@
 
 Atomify is an idiomatic Dart library for building web applications with a laser focus on simplicity and reactivity. Atomify breaks down UI development into atomic, composable elements that are both lightweight and powerful.
 
+## Documentation
+[Atomify Documentation](docs.md)
+
 ## ✨ Why Atomify?
 
 - **🪶 Minimal Footprint**: Built to be lightweight without sacrificing functionality
