@@ -77,7 +77,6 @@ void main() {
         children: [
           Reactive<int>(
             ref: counterRef,
-            initialState: 0,
             builder: (count) => Text('Count: $count'),
           ),
           Button(
@@ -116,7 +115,6 @@ Atomify integrates seamlessly with the `cssify` package for type-safe CSS:
 
 ```dart
 import 'package:atomify/atomify.dart';
-import 'package:cssify/cssify.dart';
 
 List<Cssify> styles = [
     Cssify.create(".my-container", {
