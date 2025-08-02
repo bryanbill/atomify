@@ -1,4 +1,4 @@
-## 0.1.0+2
+## 0.1.1+2
 - Added `Audio` and `Image` elements with respective references.
 - Updated the app structure to include these new elements.
 
