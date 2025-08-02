@@ -18,7 +18,6 @@ class ReactiveRef<T> extends Ref {
   @override
   void init(Box box) {
     current = box;
-    _subscription?.cancel();
   }
 
   void emit(T value, [Map<String, dynamic> data = const {}]) {

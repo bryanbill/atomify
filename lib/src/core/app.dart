@@ -2,10 +2,9 @@ import 'package:atomify/atomify.dart';
 
 class App {
   final List<Box> children;
-  final Function(Box)? onRender;
   final void Function()? beforeRender;
 
-  App({required this.children, this.onRender, this.beforeRender}) {
+  App({required this.children, this.beforeRender}) {
     if (beforeRender != null) {
       beforeRender!();
     }

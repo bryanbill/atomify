@@ -117,6 +117,8 @@ abstract class Box {
   final List<EventHandler> _eventHandlers = [];
   web.HTMLElement? _element;
 
+  web.HTMLElement? get element => _element;
+
   Box({
     this.ref,
     this.style,

@@ -10,6 +10,7 @@ export './refs/ref.dart';
 export './refs/input_ref.dart';
 export './refs/page_ref.dart';
 export './refs/reactive_ref.dart';
+export './refs/audio_ref.dart';
 
 export './elements/box.dart';
 export './elements/text.dart';
@@ -23,3 +24,5 @@ export './elements/progress.dart';
 export './elements/reactive.dart';
 export './elements/async.dart';
 export './elements/table.dart';
+export './elements/image.dart';
+export './elements/audio.dart';
