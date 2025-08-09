@@ -1,3 +1,10 @@
+## 0.1.3+4
+- Updated `Page` and `PageRef` to use `PageItem` for better structure and flexibility.
+- Enhanced `push` and `goTo` methods in `PageRef` to include `scrollToTop` and `params`.
+- Updated tests to reflect changes in `Page` and `PageRef`.
+- Fixed minor bugs in the `Page` and `PageRef` elements.
+- Updated the app structure to include these changes.
+
 ## 0.1.2+3
 - Added `scrollToTop` method to `Box` element.
 - Invoked `scrollToTop` in `Page` element when a new page is rendered.
