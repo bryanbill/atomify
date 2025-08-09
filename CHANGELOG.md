@@ -1,3 +1,9 @@
+## 0.1.4+5
+- Added `Video` class to represent video elements in the DOM with configurable properties.
+- Updated `pubspec.yaml` to reflect the new version.
+- Fixed minor bugs in the `Audio` and `Video` elements.
+- Include default query parameters in `Page` rendering.
+
 ## 0.1.3+4
 - Updated `Page` and `PageRef` to use `PageItem` for better structure and flexibility.
 - Enhanced `push` and `goTo` methods in `PageRef` to include `scrollToTop` and `params`.
