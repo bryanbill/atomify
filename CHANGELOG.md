@@ -1,3 +1,8 @@
+# 0.1.5+6
+- Updated `onPageChange` callback in `Page` to accept a `Box` instead of an index and page.
+- Updated `pubspec.yaml` to reflect the new version.
+- Fixed minor bugs in the `Audio` and `Video` elements.
+
 ## 0.1.4+5
 - Added `Video` class to represent video elements in the DOM with configurable properties.
 - Updated `pubspec.yaml` to reflect the new version.
