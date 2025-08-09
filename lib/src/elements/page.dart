@@ -4,7 +4,7 @@ import 'package:web/web.dart';
 class Page extends Box {
   List<PageItem> pages;
   int currentPageIndex;
-  final void Function(int index, {Box? page})? onPageChange;
+  final void Function(Box)? onPageChange;
 
   /// [id] is required here as it is used to identify the page in the DOM.
   Page({
@@ -67,7 +67,7 @@ class Page extends Box {
 
     scrollToTop ? this.scrollToTop() : () {}();
 
-    onPageChange?.call(index, page: page.render(params));
+    onPageChange?.call(page.render(params));
     // set to page query parameter
     var uri = Uri.parse(Uri.base.toString());
     var otherQuery = uri.queryParametersAll;
