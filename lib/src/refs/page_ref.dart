@@ -9,9 +9,9 @@ class PageRef extends Ref<Page> {
 
   final StreamController<int> _controller = StreamController<int>.broadcast();
 
-  List<Box> get pages => current?.pages ?? [];
+  List<PageItem> get pages => current?.pages ?? [];
 
-  set pages(List<Box> newPages) {
+  set pages(List<PageItem> newPages) {
     if (current != null) {
       current!.pages = newPages;
     }
@@ -37,11 +37,15 @@ class PageRef extends Ref<Page> {
     }
   }
 
-  void goTo(String id) {
+  void goTo(
+    String id, {
+    bool scrollToTop = true,
+    Map<String, dynamic>? params,
+  }) {
     if (current != null) {
       var index = current!.pages.indexWhere((page) => page.id == id);
       if (index != -1) {
-        current!.push(index);
+        current!.push(index, scrollToTop: scrollToTop, params: params);
       } else {
         throw ArgumentError('Page with id $id not found.');
       }

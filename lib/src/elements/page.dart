@@ -2,7 +2,7 @@ import 'package:atomify/src/elements/box.dart';
 import 'package:web/web.dart';
 
 class Page extends Box {
-  List<Box> pages;
+  List<PageItem> pages;
   int currentPageIndex;
   final void Function(int index, {Box? page})? onPageChange;
 
@@ -37,7 +37,11 @@ class Page extends Box {
 
   late HTMLElement _element;
 
-  void push(int index) {
+  void push(
+    int index, {
+    bool scrollToTop = true,
+    Map<String, dynamic>? params,
+  }) {
     if (index < 0 || index >= pages.length) {
       throw RangeError('Index $index is out of range for pages.');
     }
@@ -46,11 +50,11 @@ class Page extends Box {
     var page = pages[index];
     currentPageIndex = index;
 
-    _element.appendChild(page.render());
+    _element.appendChild(page.render(params).render());
 
-    scrollToTop();
+    scrollToTop ? this.scrollToTop() : () {}();
 
-    onPageChange?.call(index, page: page);
+    onPageChange?.call(index, page: page.render(params));
     // set to page query parameter
     var uri = Uri.parse(Uri.base.toString());
     var otherQuery = uri.queryParametersAll;
@@ -71,8 +75,16 @@ class Page extends Box {
     _element = super.render();
     var initial = pages[currentPageIndex];
 
-    _element.appendChild(initial.render());
+    _element.appendChild(initial.render(null).render());
 
     return _element;
   }
+}
+
+class PageItem {
+  final String id;
+  final Box Function(Map<String, dynamic>?) render;
+  final void Function(PageItem item)? onRender;
+
+  PageItem({required this.id, required this.render, this.onRender});
 }

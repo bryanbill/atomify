@@ -306,8 +306,8 @@ void main() {
       final page = Page(
         id: 'main-page',
         pages: [
-          Container(id: 'home', children: [Text('Home')]),
-          Container(id: 'about', children: [Text('About')]),
+          PageItem(id: 'home', render: (p) => Text('Home')),
+          PageItem(id: 'about', render: (p) => Text('About')),
         ],
       );
       expect(page.id, equals('main-page'));
@@ -319,8 +319,8 @@ void main() {
       final page = Page(
         id: 'nav-page',
         pages: [
-          Container(id: 'first', children: [Text('First')]),
-          Container(id: 'second', children: [Text('Second')]),
+          PageItem(id: 'first', render: (p) => Text('First')),
+          PageItem(id: 'second', render: (p) => Text('Second')),
         ],
         currentPageIndex: 1,
       );
@@ -331,9 +331,7 @@ void main() {
       expect(
         () => Page(
           id: 'invalid-page',
-          pages: [
-            Container(id: 'only', children: [Text('Only')]),
-          ],
+          pages: [PageItem(id: 'only', render: (p) => Text('Only'))],
           currentPageIndex: 5,
         ),
         throwsArgumentError,
