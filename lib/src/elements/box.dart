@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:js_interop';
 import 'package:atomify/src/atomify.dart';
 import 'package:web/web.dart' as web;
 
@@ -258,6 +259,14 @@ abstract class Box {
     _eventHandlers.clear();
     _element?.remove();
     _element = null;
+  }
+
+  void scrollToTop() {
+    assert(
+      _element != null,
+      'Cannot scroll a Box that has not been rendered yet.',
+    );
+    _element?.scrollTo(0.toJS, 0);
   }
 
   @override

@@ -48,6 +48,8 @@ class Page extends Box {
 
     _element.appendChild(page.render());
 
+    scrollToTop();
+
     onPageChange?.call(index, page: page);
     // set to page query parameter
     var uri = Uri.parse(Uri.base.toString());
