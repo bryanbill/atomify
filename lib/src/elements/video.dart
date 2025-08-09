@@ -1,16 +1,16 @@
 import 'package:atomify/atomify.dart';
 
-/// Represents an audio element in the DOM.
-/// The [Audio] class extends the [Box] class and provides properties
-/// to configure the audio element such as `src`, `autoplay`, `controls`, `loop`, and `preload`
-class Audio extends Box {
+/// Represents a video element in the DOM.
+/// The [Video] class extends the [Box] class and provides properties
+/// to configure the video element such as `src`, `autoplay`, `controls`, `loop`, and `preload`.
+class Video extends Box {
   final String src;
   final bool autoplay;
   final bool controls;
   final bool loop;
   final String? preload;
 
-  Audio({
+  Video({
     required this.src,
     this.autoplay = false,
     this.controls = true,
@@ -21,11 +21,11 @@ class Audio extends Box {
     super.className,
     super.style,
     super.attributes,
-  }) : super(tagName: 'audio');
+  }) : super(tagName: 'video');
 
   @override
   HTMLElement render() {
-    final element = super.render() as HTMLAudioElement;
+    final element = super.render() as HTMLVideoElement;
     element.src = src;
     element.autoplay = autoplay;
     element.controls = controls;

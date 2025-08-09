@@ -47,6 +47,19 @@ class Page extends Box {
     }
     _clear();
 
+    // add all the params to the query parameters
+    if (params != null) {
+      var uri = Uri.parse(Uri.base.toString());
+      var otherQuery = uri.queryParametersAll;
+      uri = uri.replace(
+        queryParameters: {
+          ...otherQuery,
+          ...params.map((k, v) => MapEntry(k, v.toString())),
+        },
+      );
+      window.history.pushState(null, '', uri.toString());
+    }
+
     var page = pages[index];
     currentPageIndex = index;
 
@@ -75,7 +88,12 @@ class Page extends Box {
     _element = super.render();
     var initial = pages[currentPageIndex];
 
-    _element.appendChild(initial.render(null).render());
+    // get all the query parameters
+    var uri = Uri.parse(Uri.base.toString());
+    var otherQuery = uri.queryParametersAll;
+    var params = {...otherQuery.map((k, v) => MapEntry(k, v.first))};
+
+    _element.appendChild(initial.render(params).render());
 
     return _element;
   }
