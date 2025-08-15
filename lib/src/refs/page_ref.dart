@@ -46,6 +46,6 @@ class PageRef extends Ref {
     page!.setCurrentView(view);
 
     page!.onPageChange?.call(view);
-    page!.setQueryParams({page!.id!: viewId});
+    page!.setQueryParams({page!.id!: viewId, ...params});
   }
 }
