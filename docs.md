@@ -18,7 +18,7 @@ This document provides comprehensive documentation for all Atomify elements, inc
 - [Interactive Elements](#interactive-elements)
   - [Button](#button)
   - [Input](#input)
-  - [Link](#link)
+  - [Link Element](#link)
 - [Layout Elements](#layout-elements)
   - [Page](#page)
 - [Remaining Elements](#remaining-elements)
