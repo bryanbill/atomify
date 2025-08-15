@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:js_interop';
 import 'package:atomify/atomify.dart';
-import 'package:atomify/src/atomify.dart';
 import 'package:web/web.dart' as web;
 
 enum Event {
@@ -321,8 +320,8 @@ class _BoxMutationObserver {
 
       for (var i = 0; i < addedNodes.length; i++) {
         final node = addedNodes.item(i);
-        if (node is web.HTMLElement) {
-          _checkForBoxElements(node, processedBoxes);
+        if (node.isA<web.HTMLElement>()) {
+          _checkForBoxElements(node as web.HTMLElement, processedBoxes);
         }
       }
     }
@@ -357,8 +356,8 @@ class _BoxMutationObserver {
     final children = element.children;
     for (int i = 0; i < children.length; i++) {
       final child = children.item(i);
-      if (child is web.HTMLElement) {
-        _checkForBoxElements(child, processedBoxes);
+      if (child.isA<web.HTMLElement>()) {
+        _checkForBoxElements(child as web.HTMLElement, processedBoxes);
       }
     }
   }

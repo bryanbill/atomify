@@ -39,8 +39,8 @@ class _PageMutationObserver {
 
       for (var i = 0; i < addedNodes.length; i++) {
         final node = addedNodes.item(i);
-        if (node is web.HTMLElement) {
-          _checkForPageElements(node, processedPages);
+        if (node.isA<web.HTMLElement>()) {
+          _checkForPageElements(node as web.HTMLElement, processedPages);
           _checkForViewElements(node, processedViewElements);
         }
       }
@@ -78,8 +78,8 @@ class _PageMutationObserver {
     final children = element.children;
     for (int i = 0; i < children.length; i++) {
       final child = children.item(i);
-      if (child is web.HTMLElement) {
-        _checkForPageElements(child, processedPages);
+      if (child.isA<web.HTMLElement>()) {
+        _checkForPageElements(child as web.HTMLElement, processedPages);
       }
     }
   }
@@ -98,8 +98,8 @@ class _PageMutationObserver {
     final children = element.children;
     for (int i = 0; i < children.length; i++) {
       final child = children.item(i);
-      if (child is web.HTMLElement) {
-        _checkForViewElements(child, processedViewElements);
+      if (child.isA<web.HTMLElement>()) {
+        _checkForViewElements(child as web.HTMLElement, processedViewElements);
       }
     }
   }
