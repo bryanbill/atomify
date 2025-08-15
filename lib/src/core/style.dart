@@ -375,7 +375,9 @@ class Style {
   }
 
   /// Injects the CSS for all breakpoints and pseudo states into the document head.
-  void injectCss() {
+  /// Optionally, you can specify a target element to append the styles to.
+  /// If no target is specified, it defaults to the document head.
+  void injectCss({String? target}) {
     String camelToKebab(String input) => input.replaceAllMapped(
       RegExp(r'[A-Z]'),
       (m) => '-${m.group(0)!.toLowerCase()}',
@@ -417,7 +419,18 @@ class Style {
     });
 
     styleElement.textContent = buffer.toString();
-    web.document.head!.append(styleElement);
+    if (target != null) {
+      final targetElement = web.document.querySelector(target);
+      if (targetElement != null) {
+        targetElement.append(styleElement);
+      } else {
+        throw ArgumentError(
+          'Target element "$target" not found in the document.',
+        );
+      }
+    } else {
+      web.document.head!.append(styleElement);
+    }
   }
 
   static String _pseudoSelector(PseudoState state) {
@@ -670,8 +683,8 @@ class Style {
 }
 
 /// Global way of defining all styles
-void useStyle(List<Style> styles) {
+void useStyle(List<Style> styles, {String? target}) {
   for (var style in styles) {
-    style.injectCss();
+    style.injectCss(target: target);
   }
 }

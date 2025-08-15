@@ -4,6 +4,10 @@ class Stack {
   static final List<Box> _boxes = [];
 
   static void push(Box box) {
+    if (_boxes.where((box) => box.id == box.id).isNotEmpty) {
+      return;
+    }
+
     _boxes.add(box);
   }
 

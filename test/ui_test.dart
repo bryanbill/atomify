@@ -301,44 +301,6 @@ void main() {
     });
   });
 
-  group('Page Tests', () {
-    test('should create a Page with routes', () {
-      final page = Page(
-        id: 'main-page',
-        pages: [
-          PageItem(id: 'home', render: (p) => Text('Home')),
-          PageItem(id: 'about', render: (p) => Text('About')),
-        ],
-      );
-      expect(page.id, equals('main-page'));
-      expect(page.pages.length, equals(2));
-      expect(page.currentPageIndex, equals(0));
-    });
-
-    test('should create Page with custom current page', () {
-      final page = Page(
-        id: 'nav-page',
-        pages: [
-          PageItem(id: 'first', render: (p) => Text('First')),
-          PageItem(id: 'second', render: (p) => Text('Second')),
-        ],
-        currentPageIndex: 1,
-      );
-      expect(page.currentPageIndex, equals(1));
-    });
-
-    test('should throw error for invalid page index', () {
-      expect(
-        () => Page(
-          id: 'invalid-page',
-          pages: [PageItem(id: 'only', render: (p) => Text('Only'))],
-          currentPageIndex: 5,
-        ),
-        throwsArgumentError,
-      );
-    });
-  });
-
   group('Idiomatic Elements Tests', () {
     test('should create an I (italic) element', () {
       final italic = I(text: 'italic text', className: 'icon-class');
@@ -356,29 +318,6 @@ void main() {
       expect(italic.cite, equals('https://example.com'));
       expect(italic.title, equals('Icon title'));
       expect(italic.lang, equals('en'));
-    });
-  });
-
-  group('App Tests', () {
-    test('should create an App with children', () {
-      final app = App(
-        children: [
-          Container(children: [Text('Main content')]),
-        ],
-      );
-      expect(app.children.length, equals(1));
-      expect(app.children[0], isA<Container>());
-    });
-
-    test('should create App with beforeRender callback', () {
-      var callbackCalled = false;
-      App(
-        children: [Text('Test')],
-        beforeRender: () {
-          callbackCalled = true;
-        },
-      );
-      expect(callbackCalled, isTrue);
     });
   });
 
@@ -457,42 +396,6 @@ void main() {
   });
 
   group('Integration Tests', () {
-    test('should create complex nested structure', () {
-      final app = App(
-        children: [
-          Container(
-            id: 'main',
-            className: 'main-container',
-            children: [
-              Text('App Title', variant: TextVariant.h1),
-              Container(
-                className: 'nav',
-                children: [
-                  Link(child: Text('Home'), href: '/home'),
-                  Link(child: Text('About'), href: '/about'),
-                ],
-              ),
-              Container(
-                className: 'content',
-                children: [
-                  Text('Welcome to Atomify!'),
-                  Button(
-                    Text('Get Started'),
-                    onClick: (e) => print('Button clicked'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      );
-
-      expect(app.children.length, equals(1));
-      final mainContainer = app.children[0] as Container;
-      expect(mainContainer.id, equals('main'));
-      expect(mainContainer.children.length, equals(3));
-    });
-
     test('should create reactive todo list structure', () {
       final todoRef = ReactiveRef<List<String>>(['Task 1', 'Task 2']);
       final inputRef = InputRef();

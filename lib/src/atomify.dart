@@ -13,6 +13,7 @@ export './refs/reactive_ref.dart';
 export './refs/audio_ref.dart';
 
 export './elements/box.dart';
+export './elements/view.dart';
 export './elements/text.dart';
 export './elements/container.dart';
 export './elements/link.dart';
