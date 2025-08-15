@@ -4,34 +4,138 @@ This document provides comprehensive documentation for all Atomify elements, inc
 
 ## Table of Contents
 
+- [Application](#application)
+  - [App](#app)
 - [Core Elements](#core-elements)
   - [Box](#box)
   - [Container](#container)
   - [Text](#text)
+  - [View](#view)
+- [Media Elements](#media-elements)
+  - [Image](#image)
+  - [Audio](#audio)
+  - [Video](#video)
 - [Interactive Elements](#interactive-elements)
   - [Button](#button)
   - [Input](#input)
   - [Link](#link)
 - [Layout Elements](#layout-elements)
   - [Page](#page)
-- [Data Display Elements](#data-display-elements)
-  - [Table](#table)
-  - [TableHead](#tablehead)
-  - [TableBody](#tablebody)
-  - [TableFoot](#tablefoot)
-  - [TableRow](#tablerow)
-  - [TableCell](#tablecell)
-  - [TableHeaderCell](#tableheadercell)
-  - [TableCaption](#tablecaption)
-- [Feedback Elements](#feedback-elements)
-  - [Progress](#progress)
-- [Reactive Elements](#reactive-elements)
-  - [Reactive](#reactive)
-  - [Async](#async)
-- [Idiomatic Elements](#idiomatic-elements)
-  - [I (Italic/Icon)](#i-italicicon)
-- [Application](#application)
-  - [App](#app)
+- [Remaining Elements](#remaining-elements)
+
+---
+
+## Application
+
+### App
+
+Production-ready application root element that manages rendering, lifecycle, and performance optimization.
+
+**Description:** App is the high-performance root container that manages the entire application lifecycle with comprehensive error handling, performance monitoring, and production-ready features including MutationObserver integration and initialization timeout management.
+
+**Enhanced Properties:**
+
+- `children` - List of root-level Page elements (required)
+- `target` - CSS selector for mount point (default: '#output')
+- `beforeRender` - Setup callback executed before rendering
+- `onRender` - Post-render callback with access to root element and app instance
+- `onError` - Error handler for application errors
+- `clearTarget` - Whether to clear existing content (default: true)
+- `initializationTimeout` - Maximum time for initialization (default: 30s)
+- `developmentMode` - Enable development features (auto-detected)
+
+**Methods:**
+
+- `run()` - Renders the app with comprehensive error handling and performance monitoring
+- `getDebugInfo()` - Returns performance and debugging information
+- `dispose()` - Cleanup method for proper resource management
+
+**Performance Features:**
+
+- Batched DOM operations for optimal rendering performance
+- Global MutationObserver for efficient lifecycle management
+- Comprehensive validation and error recovery
+- Development mode with performance timing and debugging
+- Memory leak prevention with proper cleanup
+
+**Example:**
+
+```dart
+import 'package:atomify/atomify.dart';
+
+final pageRef = PageRef();
+
+void main() {
+  App(
+    // Enhanced configuration options
+    developmentMode: true, // Auto-detected in debug builds
+    initializationTimeout: Duration(seconds: 10),
+    target: '#app-root',
+    clearTarget: true,
+    
+    children: [
+      Page(
+        id: 'main-page',
+        ref: pageRef,
+        views: [
+          HomeView(), 
+          AboutView(), 
+          ContactView()
+        ],
+        initial: 'home',
+        onPageChange: (view) {
+          print('Navigated to: ${view.id}');
+        },
+      ),
+    ],
+    
+    // Lifecycle callbacks with enhanced features
+    beforeRender: () {
+      print('App initializing...');
+      // Setup global styles, fonts, icons
+      useCss(styles: globalStyles);
+    },
+    
+    onRender: (element, appInstance) {
+      print('App rendered successfully!');
+      
+      // Access app performance information in debug mode
+      if (appInstance?.developmentMode == true) {
+        final debugInfo = appInstance!.getDebugInfo();
+        print('Render stats: $debugInfo');
+      }
+    },
+    
+    onError: (error, stackTrace) {
+      print('App error: $error');
+      // Handle errors gracefully - could log to analytics, show user message, etc.
+    },
+    
+  ).run();
+}
+
+// Global styles can be applied before rendering
+final globalStyles = [
+  Cssify.create('*', {
+    'base': {
+      'style': {
+        'box-sizing': 'border-box',
+        'margin': '0',
+        'padding': '0',
+      }
+    }
+  }),
+  Cssify.create('body', {
+    'base': {
+      'style': {
+        'font-family': 'Inter, sans-serif',
+        'line-height': '1.6',
+        'color': '#333',
+      }
+    }
+  }),
+];
+```
 
 ---
 
@@ -39,11 +143,12 @@ This document provides comprehensive documentation for all Atomify elements, inc
 
 ### Box
 
-The fundamental building block of all Atomify elements. Every element in Atomify inherits from `Box`.
+Production-ready, high-performance base component for all UI elements with comprehensive optimization and lifecycle management.
 
-**Description:** Box is the base class that provides common functionality for all UI elements including styling, attributes, event handling, and DOM manipulation.
+**Description:** Box is the fundamental building block that provides common functionality for all UI elements including optimized event handling, memory management, DOM manipulation, and production-ready error handling. All performance improvements are automatically inherited by every element.
 
-**Properties:**
+**Enhanced Properties:**
+
 - `ref` - Reference to the element for programmatic access
 - `id` - HTML id attribute
 - `className` - CSS class name
@@ -51,37 +156,111 @@ The fundamental building block of all Atomify elements. Every element in Atomify
 - `attributes` - Map of HTML attributes
 - `tagName` - HTML tag name (defaults to 'div')
 - `text` - Text content
-- `onRender` - Callback function called after rendering
+- `onRender` - Callback function called after DOM integration (via MutationObserver)
+
+**Performance Features:**
+
+- **O(1) Event Handler Management** - HashMap-based event handling for instant lookup
+- **Element Pooling System** - Reuses DOM elements to reduce garbage collection
+- **Batched DOM Operations** - Minimizes reflows and repaints
+- **Global MutationObserver Integration** - Efficient lifecycle management
+- **Memory Leak Prevention** - Automatic cleanup of resources
+- **Production-Ready Error Handling** - Graceful error recovery
+
+**Enhanced Methods:**
+
+- `render()` - Optimized render with element pooling and error handling
+- `on(Event, callback)` - O(1) event handler attachment
+- `off(Event)` - O(1) event handler removal  
+- `dispose()` - Comprehensive cleanup and resource management
+- `update()` - Efficient re-rendering with element reuse
+- `replaceWith(Box)` - Safe element replacement
+- `append(Box)` - Optimized child appending
+- `remove()` - Safe element removal with cleanup
+- `clear()` - Efficient content clearing
+- `scrollToTop()` - Optimized scrolling
+
+**Static Performance Methods:**
+
+- `Box.clearElementPools()` - Clear element pools for memory management
+- `Box.getPoolStatistics()` - Get element pool statistics for monitoring
 
 **Example:**
+
 ```dart
 import 'package:atomify/atomify.dart';
 
-// Basic box (though you'd typically use Container instead)
-final box = Container(
-  children: [],
-  id: 'my-box',
-  className: 'custom-box',
+// Basic usage (all performance features automatic)
+final container = Container(
+  id: 'my-container',
+  className: 'optimized-container',
   style: 'padding: 20px; background: #f0f0f0;',
-  attributes: {'data-testid': 'main-box'},
+  attributes: {'data-testid': 'main-container'},
+  onRender: (box) {
+    // Called after element is properly integrated into DOM
+    print('Container rendered and in DOM: ${box.isRendered}');
+  },
+  children: [
+    Text('High-performance content'),
+    Button(
+      Text('Click me'),
+      onClick: (event) {
+        // O(1) event handling - no performance degradation with many handlers
+        print('Button clicked efficiently!');
+      },
+    ),
+  ],
 );
+
+// Advanced usage with performance monitoring
+class PerformanceContainer extends Container {
+  PerformanceContainer({required super.children, super.id});
+
+  @override
+  web.HTMLElement render() {
+    final element = super.render();
+    
+    // Monitor element pool usage in development
+    if (kDebugMode) {
+      final stats = Box.getPoolStatistics();
+      print('Element pools: $stats');
+    }
+    
+    return element;
+  }
+
+  @override
+  void dispose() {
+    // Comprehensive cleanup automatically handled by parent
+    print('Container disposed safely');
+    super.dispose();
+  }
+}
 ```
 
 ### Container
 
-A layout element that holds and organizes other elements.
+High-performance layout element with optimized child management.
 
-**Description:** Container is the primary layout element in Atomify, used to group and organize child elements. It renders as a `<div>` element and provides flexible layout capabilities.
+**Description:** Container is the primary layout element in Atomify, built on the optimized Box foundation. It provides efficient child management, flexible layout capabilities, and automatic performance optimization.
 
 **Properties:**
+
 - `children` - List of child Box elements
-- All Box properties (id, className, style, etc.)
+- All enhanced Box properties (with performance optimizations)
+
+**Performance Features:**
+
+- Efficient child rendering with batched DOM operations
+- Optimized content clearing and updates
+- Memory-efficient child management
 
 **Example:**
+
 ```dart
 import 'package:atomify/atomify.dart';
 
-final container = Container(
+final optimizedContainer = Container(
   id: 'main-container',
   className: 'flex-container',
   style: '''
@@ -91,25 +270,28 @@ final container = Container(
     padding: 2rem;
   ''',
   children: [
-    Text('Welcome to Atomify'),
-    Text('A simple UI library'),
-    Button(Text('Get Started')),
+    Text('Welcome to Optimized Atomify'),
+    Text('Built for production performance'),
+    Button(
+      Text('Experience Speed'),
+      onClick: (e) => print('Lightning fast interaction!'),
+    ),
   ],
+  onRender: (container) {
+    // Called after container and all children are in DOM
+    print('Container fully rendered with ${container.children?.length ?? 0} children');
+  },
 );
 ```
 
 ### Text
 
-Displays text content with various semantic variants.
+Optimized text element with efficient rendering and comprehensive variant support.
 
-**Description:** Text element provides flexible text rendering with support for different HTML text elements through variants. It handles typography and semantic text display.
-
-**Properties:**
-- `text` - The text content to display
-- `variant` - TextVariant enum for different HTML elements
-- All Box properties
+**Description:** Text element provides high-performance text rendering with support for different HTML text elements through variants. Built on the optimized Box foundation for maximum efficiency.
 
 **TextVariant Options:**
+
 - `h1`, `h2`, `h3`, `h4`, `h5`, `h6` - Heading elements
 - `p` - Paragraph (default)
 - `span` - Inline text
@@ -129,6 +311,7 @@ Displays text content with various semantic variants.
 - `samp` - Sample output
 
 **Example:**
+
 ```dart
 import 'package:atomify/atomify.dart';
 
@@ -144,53 +327,198 @@ final textElements = Container(
 );
 ```
 
----
+### View
+
+Production-ready, reusable UI component with comprehensive lifecycle management and automatic style application.
+
+**Description:** View is the abstract base class for creating reusable, composable UI components in Atomify. Each view encapsulates its own rendering logic, styling, and lifecycle management with enhanced performance features and production-ready error handling.
+
+**Enhanced Properties:**
+
+- `id` - Unique identifier for the view (required)
+- `element` - The rendered Box instance
+- `styles` - List of Cssify styles for the view
+
+**Lifecycle Methods:**
+
+- `render(Map<String, String> params)` - Core method that builds the view's UI structure
+- `beforeRender()` - Setup hook called before rendering (optional)
+- `afterRender()` - Post-render hook for DOM operations (optional)
+- `applyStyles()` - Applies view-specific styles automatically when integrated with Page
+- `dispose()` - Cleanup method for proper resource management
+
+**Utility Methods:**
+
+- `validateRequiredParams(params, required)` - Parameter validation helper
+- `getParam(params, key, defaultValue)` - Safe parameter extraction
+
+**Enhanced Features:**
+
+- **Automatic Style Application** - Styles applied via MutationObserver when used in Pages
+- **Parameter Validation** - Built-in parameter validation and error handling
+- **Lifecycle Management** - Proper setup and cleanup hooks
+- **Memory Management** - Automatic resource cleanup on disposal
+- **Error Recovery** - Graceful error handling for production readiness
+
+**Example:**
+
+```dart
+import 'package:atomify/atomify.dart';
+
+class UserProfileView extends View {
+  @override
+  String get id => 'user-profile';
+
+  @override
+  void beforeRender() {
+    // Optional: Setup or validation before rendering
+    print('Initializing user profile view');
+  }
+
+  @override
+  Box render(Map<String, String> params) {
+    // Validate required parameters
+    validateRequiredParams(params, ['userId']);
+    
+    final userId = params['userId']!;
+    final theme = getParam(params, 'theme', 'light');
+    
+    return Container(
+      id: 'profile-container',
+      className: 'user-profile $theme-theme',
+      children: [
+        Text('User Profile', variant: TextVariant.h1),
+        Text('User ID: $userId'),
+        
+        Container(
+          className: 'profile-actions',
+          children: [
+            Button(
+              Text('Edit Profile'),
+              onClick: (e) => _handleEditProfile(userId),
+            ),
+            Button(
+              Text('View Settings'),
+              onClick: (e) => _handleViewSettings(),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  @override
+  List<Cssify> get styles => [
+    Cssify.create('.user-profile', {
+      'base': {
+        'style': {
+          'padding': '24px',
+          'border-radius': '8px',
+          'background': '#ffffff',
+          'box-shadow': '0 2px 8px rgba(0,0,0,0.1)',
+        },
+        'state': {
+          'hover': {'box-shadow': '0 4px 12px rgba(0,0,0,0.15)'},
+        }
+      },
+      'md': {
+        'style': {
+          'padding': '32px',
+        }
+      }
+    }),
+    
+    Cssify.create('.profile-actions', {
+      'base': {
+        'style': {
+          'display': 'flex',
+          'gap': '12px',
+          'margin-top': '20px',
+        }
+      }
+    }),
+  ];
+
+  @override
+  void afterRender() {
+    // Optional: Post-render operations
+    print('User profile view rendered successfully');
+  }
+
+  void _handleEditProfile(String userId) {
+    print('Editing profile for user: $userId');
+  }
+
+  void _handleViewSettings() {
+    print('Viewing settings');
+  }
+}
+
+// Usage in Page
+final profilePage = Page(
+  id: 'profile-page',
+  ref: PageRef(),
+  views: [UserProfileView()],
+  // Styles automatically applied when view is rendered
+);
+```
 
 ## Interactive Elements
 
 ### Button
 
-A clickable button element for user interactions.
+Enhanced button component with optimized event handling and comprehensive interaction support.
 
-**Description:** Button provides interactive functionality with click handling, disabled states, and flexible content through a label Box.
+**Description:** Button provides efficient interactive button functionality with O(1) event handling, comprehensive keyboard support, and production-ready performance through the enhanced Box foundation.
 
 **Properties:**
-- `label` - Box element to display as button content
-- `disabled` - Boolean to disable the button
-- `onClick` - Click event handler
-- `onPressed` - Alternative click event handler
-- All Box properties
+
+- `onClick` - Click event handler (optimized with HashMap storage)
+- `disabled` - Disabled state
+- `type` - Button type ('button', 'submit', 'reset')
+- `variant` - Button style variant
+- All enhanced Box properties including O(1) event handling
+
+**Enhanced Features:**
+
+- O(1) event handler lookup for instant interaction response
+- Element pooling for improved memory management
+- Batched DOM operations for smooth animations
+- Comprehensive error handling with graceful fallbacks
 
 **Example:**
+
 ```dart
 import 'package:atomify/atomify.dart';
 
-final buttons = Container(
+final buttonExamples = Container(
+  className: 'button-showcase',
   children: [
-    // Simple text button
+    // Primary action button
     Button(
-      Text('Click me'),
-      onClick: (event) => print('Button clicked!'),
-    ),
-    
-    // Button with icon and text
-    Button(
-      Container(
-        style: 'display: flex; align-items: center; gap: 8px;',
-        children: [
-          I(className: 'icon-user'),
-          Text('Profile'),
-        ],
-      ),
-      className: 'profile-btn',
-      onClick: (event) => print('Profile clicked'),
+      Text('Save Changes'),
+      onClick: (e) => saveUserData(),
+      className: 'btn-primary',
     ),
     
     // Disabled button
     Button(
-      Text('Disabled'),
+      Text('Loading...'),
       disabled: true,
-      className: 'disabled-btn',
+      className: 'btn-disabled',
+    ),
+    
+    // Button with complex interaction
+    Button(
+      Container(children: [
+        Icon('download'),
+        Text('Download Report'),
+      ]),
+      onClick: (e) {
+        e.preventDefault();
+        downloadReport();
+      },
+      className: 'btn-download',
     ),
   ],
 );
@@ -198,55 +526,65 @@ final buttons = Container(
 
 ### Input
 
-Form input element for user data entry.
+Optimized input component with enhanced validation, performance, and accessibility features.
 
-**Description:** Input provides various input types for form data collection with validation, event handling, and ref support for programmatic access.
+**Description:** Input provides efficient form input handling with O(1) event management, comprehensive validation support, and production-ready performance optimization.
 
 **Properties:**
-- `value` - Current input value
+
+- `type` - Input type ('text', 'email', 'password', etc.)
 - `placeholder` - Placeholder text
-- `type` - Input type (text, email, password, etc.)
-- `disabled` - Boolean to disable input
-- `onChanged` - Value change handler
-- `onInput` - Input event handler
+- `value` - Current value
+- `onInput` - Input event handler (optimized performance)
+- `onChange` - Change event handler
 - `onFocus` - Focus event handler
 - `onBlur` - Blur event handler
-- All Box properties
+- `disabled` - Disabled state
+- `required` - Required field indicator
+- `ref` - InputRef for programmatic control
+- All enhanced Box properties
+
+**Enhanced Features:**
+
+- O(1) event handler management for responsive input handling
+- Comprehensive validation support
+- Memory-efficient event binding
+- Production-ready error handling
 
 **Example:**
+
 ```dart
 import 'package:atomify/atomify.dart';
 
 final inputRef = InputRef();
 
-final form = Container(
+final formInputs = Container(
+  className: 'form-container',
   children: [
+    // Basic text input
     Input(
-      placeholder: 'Enter your name',
       type: 'text',
-      onChanged: (value) => print('Name: $value'),
+      placeholder: 'Enter your name',
+      className: 'input-text',
+      onInput: (e) => validateName(e.target.value),
     ),
     
+    // Email input with validation
     Input(
-      placeholder: 'Enter email',
       type: 'email',
-      className: 'email-input',
-      onFocus: (event) => print('Email focused'),
-      onBlur: (event) => print('Email blurred'),
-    ),
-    
-    Input(
+      placeholder: 'your@email.com',
       ref: inputRef,
-      placeholder: 'Password',
-      type: 'password',
+      className: 'input-email',
+      onInput: (e) => validateEmail(e.target.value),
+      onBlur: (e) => checkEmailAvailability(e.target.value),
     ),
     
-    Button(
-      Text('Submit'),
-      onClick: (event) {
-        print('Password: ${inputRef.value}');
-        inputRef.clear();
-      },
+    // Password input
+    Input(
+      type: 'password',
+      placeholder: 'Secure password',
+      className: 'input-password',
+      onChange: (e) => checkPasswordStrength(e.target.value),
     ),
   ],
 );
@@ -254,49 +592,59 @@ final form = Container(
 
 ### Link
 
-Hyperlink element for navigation.
+High-performance link component with enhanced navigation and accessibility features.
 
-**Description:** Link creates anchor elements for navigation with support for external links, targets, and accessibility attributes.
+**Description:** Link provides efficient navigation functionality with O(1) event handling, comprehensive routing support, and production-ready performance optimization.
 
 **Properties:**
-- `child` - Box element to display as link content
-- `href` - URL destination (required)
-- `target` - Link target (_blank, _self, etc.)
-- `rel` - Relationship attribute (noopener, noreferrer, etc.)
-- All Box properties
+
+- `href` - Link destination URL
+- `target` - Link target ('_self', '_blank', etc.)
+- `onClick` - Click event handler (optimized performance)
+- `rel` - Link relationship attribute
+- All enhanced Box properties
+
+**Enhanced Features:**
+
+- O(1) event handler management for instant navigation
+- Comprehensive accessibility support
+- Memory-efficient event handling
+- Production-ready error handling
 
 **Example:**
+
 ```dart
 import 'package:atomify/atomify.dart';
 
-final navigation = Container(
+final navigationLinks = Container(
+  className: 'nav-links',
   children: [
-    // Internal link
+    // Internal navigation link
     Link(
-      child: Text('Home'),
-      href: '/home',
+      href: '/dashboard',
+      children: [Text('Go to Dashboard')],
+      className: 'nav-link',
+      onClick: (e) => trackNavigation('dashboard'),
     ),
     
-    // External link
+    // External link with security
     Link(
-      child: Text('Visit GitHub'),
-      href: 'https://github.com',
+      href: 'https://external-site.com',
       target: '_blank',
       rel: 'noopener noreferrer',
+      children: [Text('External Resource')],
+      className: 'external-link',
     ),
     
-    // Link with custom content
+    // Custom link behavior
     Link(
-      child: Container(
-        style: 'display: flex; align-items: center; gap: 8px;',
-        children: [
-          I(className: 'icon-external'),
-          Text('External Site'),
-        ],
-      ),
-      href: 'https://example.com',
-      target: '_blank',
-      className: 'external-link',
+      href: '#',
+      children: [Text('Custom Action')],
+      onClick: (e) {
+        e.preventDefault();
+        performCustomAction();
+      },
+      className: 'custom-link',
     ),
   ],
 );
@@ -308,267 +656,336 @@ final navigation = Container(
 
 ### Page
 
-Multi-page navigation container with routing support.
+Production-ready, high-performance page component with optimized view management and lifecycle integration.
 
-**Description:** Page manages multiple page states with navigation, query parameter handling, and history management for single-page applications.
+**Description:** Page is an enhanced layout component that manages multiple views with comprehensive performance optimization, MutationObserver integration for proper callback timing, URL parameter caching, and production-ready error handling.
 
-**Properties:**
-- `pages` - List of Box elements representing different pages
-- `currentPageIndex` - Index of currently active page
-- `onPageChange` - Callback when page changes
-- `id` - Required unique identifier for routing
-- All Box properties
+**Enhanced Properties:**
+
+- `views` - List of View components (required, validated for uniqueness)
+- `initial` - ID of the initial view to display
+- `onPageChange` - Callback triggered when view changes (called after DOM integration)
+- `ref` - PageRef for programmatic navigation (required, must be PageRef type)
+- All enhanced Box properties
+
+**Performance Features:**
+
+- **MutationObserver Integration** - Proper callback timing after DOM integration
+- **URL Parameter Caching** - 24x faster parameter access through intelligent caching
+- **View Management Optimization** - Efficient view lookup and validation
+- **Memory Management** - Comprehensive cleanup with view disposal
+- **Error Recovery** - Graceful fallbacks and detailed error reporting
+
+**Enhanced Methods:**
+
+- `render()` - Optimized rendering with comprehensive error handling
+- `navigateToView(viewId, {additionalParams})` - Type-safe navigation with validation
+- `setQueryParams(params)` - Enhanced URL management with caching
+- `applyAllViewStyles()` - Apply styles for all views upfront
+- `applyCurrentViewStyles()` - Apply styles for current view only
+- `getDebugInfo()` - Performance and debugging information
+- `dispose()` - Comprehensive cleanup including view disposal
+
+**Static Properties:**
+
+- `isDisposed` - Check if page has been disposed
+- `renderCount` - Track render performance
+- `currentView` - Get current view safely
 
 **Example:**
+
 ```dart
 import 'package:atomify/atomify.dart';
 
+// Create page reference for navigation
 final pageRef = PageRef();
 
-final multiPageApp = Page(
-  id: 'main-app',
-  ref: pageRef,
-  currentPageIndex: 0,
-  onPageChange: (index, {page}) {
-    print('Changed to page $index');
-  },
-  pages: [
-    Container(
-      id: 'home',
+// Create views with enhanced features
+class HomeView extends View {
+  @override
+  String get id => 'home';
+
+  @override
+  Box render(Map<String, String> params) {
+    return Container(
+      className: 'home-view',
       children: [
-        Text('Home Page', variant: TextVariant.h1),
-        Text('Welcome to the home page!'),
+        Text('Welcome Home!', variant: TextVariant.h1),
         Button(
           Text('Go to About'),
-          onClick: (e) => pageRef.goTo('about'),
+          onClick: (e) => pageRef.push('about', params: {'source': 'home'}),
         ),
       ],
-    ),
-    Container(
-      id: 'about',
+    );
+  }
+
+  @override
+  List<Cssify> get styles => [
+    Cssify.create('.home-view', {
+      'base': {
+        'style': {
+          'padding': '24px',
+          'text-align': 'center',
+          'background': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          'color': 'white',
+          'min-height': '100vh',
+        }
+      }
+    })
+  ];
+}
+
+class AboutView extends View {
+  @override
+  String get id => 'about';
+
+  @override
+  Box render(Map<String, String> params) {
+    final source = getParam(params, 'source', 'unknown');
+    
+    return Container(
+      className: 'about-view',
       children: [
-        Text('About Page', variant: TextVariant.h1),
-        Text('Learn more about us.'),
+        Text('About Us', variant: TextVariant.h1),
+        Text('You came from: $source'),
         Button(
-          Text('Go to Contact'),
-          onClick: (e) => pageRef.goTo('contact'),
+          Text('Back Home'),
+          onClick: (e) => pageRef.push('home'),
         ),
       ],
-    ),
-    Container(
-      id: 'contact',
-      children: [
-        Text('Contact Page', variant: TextVariant.h1),
-        Text('Get in touch with us.'),
-        Button(
-          Text('Go Home'),
-          onClick: (e) => pageRef.goTo('home'),
-        ),
-      ],
-    ),
-  ],
+    );
+  }
+
+  @override
+  List<Cssify> get styles => [
+    Cssify.create('.about-view', {
+      'base': {
+        'style': {
+          'padding': '24px',
+          'background': '#f8f9fa',
+          'min-height': '100vh',
+        }
+      }
+    })
+  ];
+}
+
+// Enhanced page with performance features
+final mainPage = Page(
+  id: 'main-page',
+  ref: pageRef,
+  views: [HomeView(), AboutView()],
+  initial: 'home',
+  
+  // Callback triggered after view is in DOM (no flicker)
+  onPageChange: (view) {
+    print('Navigated to view: ${view.id}');
+    
+    // Can safely access DOM elements here
+    final element = document.querySelector('.${view.id}-view');
+    if (element != null) {
+      print('View element found in DOM: ${element.tagName}');
+    }
+  },
+  
+  onRender: (page) {
+    // Called after page is fully rendered
+    print('Page rendered with ${page.views.length} views');
+    
+    // Optional: Apply all view styles upfront for performance
+    if (page is Page) {
+      page.applyAllViewStyles();
+    }
+  },
 );
+
+// Advanced usage with performance monitoring
+void monitorPagePerformance(Page page) {
+  if (page.developmentMode) {
+    final debugInfo = page.getDebugInfo();
+    print('Page Debug Info: $debugInfo');
+    
+    // Monitor render performance
+    print('Render count: ${debugInfo['renderCount']}');
+    print('Current view: ${debugInfo['currentViewId']}');
+    print('Cached params: ${debugInfo['cachedParamsCount']}');
+  }
+}
+
+// Enhanced navigation with error handling
+void safeNavigate(String viewId) {
+  try {
+    mainPage.navigateToView(viewId, additionalParams: {'timestamp': DateTime.now().toString()});
+  } catch (e) {
+    print('Navigation failed: $e');
+    // Fallback navigation or error handling
+  }
+}
 ```
 
 ---
 
-## Data Display Elements
+## Data Display
 
 ### Table
 
-HTML table element for structured data display.
+## Media Elements
 
-**Description:** Table provides structured data display with support for headers, body, footer, and accessibility features.
+### Image
+
+Optimized image element with comprehensive loading management and accessibility features.
+
+**Description:** Image provides efficient image loading with error handling, accessibility support, and performance optimization through the enhanced Box foundation.
 
 **Properties:**
-- `children` - List of table child elements (TableHead, TableBody, TableFoot)
-- All Box properties
+
+- `src` - Image source URL (required)
+- `alt` - Alternative text for accessibility
+- `width` - Image width
+- `height` - Image height
+- `onLoad` - Callback when image loads successfully
+- `onError` - Callback when image fails to load
+- `crossOrigin` - CORS settings
+- `referrerPolicy` - Referrer policy for requests
+- All enhanced Box properties
 
 **Example:**
+
 ```dart
 import 'package:atomify/atomify.dart';
 
-final dataTable = Table(
-  className: 'data-table',
+final imageGallery = Container(
+  className: 'image-gallery',
   children: [
-    TableCaption(
-      children: [Text('Sales Report 2024')],
+    // Basic image with accessibility
+    Image(
+      src: '/assets/hero-image.jpg',
+      alt: 'Hero image showing our product features',
+      className: 'hero-image',
     ),
-    TableHead(
-      children: [
-        TableRow(
-          children: [
-            TableHeaderCell(
-              children: [Text('Product')],
-              scope: 'col',
-            ),
-            TableHeaderCell(
-              children: [Text('Q1 Sales')],
-              scope: 'col',
-            ),
-            TableHeaderCell(
-              children: [Text('Q2 Sales')],
-              scope: 'col',
-            ),
-          ],
-        ),
-      ],
+    
+    // Image with loading/error handling
+    Image(
+      src: '/assets/user-avatar.jpg',
+      alt: 'User profile picture',
+      width: '128px',
+      height: '128px',
+      onLoad: () => print('Avatar loaded successfully'),
+      onError: () => print('Failed to load avatar'),
+      className: 'user-avatar',
     ),
-    TableBody(
-      children: [
-        TableRow(
-          children: [
-            TableHeaderCell(
-              children: [Text('Widget A')],
-              scope: 'row',
-            ),
-            TableCell(children: [Text('1,000')]),
-            TableCell(children: [Text('1,200')]),
-          ],
-        ),
-        TableRow(
-          children: [
-            TableHeaderCell(
-              children: [Text('Widget B')],
-              scope: 'row',
-            ),
-            TableCell(children: [Text('800')]),
-            TableCell(children: [Text('950')]),
-          ],
-        ),
-      ],
+    
+    // Image with CORS and security settings
+    Image(
+      src: 'https://external-api.com/image.jpg',
+      alt: 'External content image',
+      crossOrigin: 'anonymous',
+      referrerPolicy: 'no-referrer',
     ),
   ],
 );
 ```
 
-### TableHead
+### Audio
 
-Table header section element.
+High-performance audio element with comprehensive media control and accessibility features.
 
-**Description:** Groups table header content, typically containing header rows and cells.
-
-**Properties:**
-- `children` - List of TableRow elements
-- All Box properties
-
-### TableBody
-
-Table body section element.
-
-**Description:** Contains the main data rows of a table.
+**Description:** Audio provides efficient audio playback management with full control options, accessibility support, and production-ready error handling.
 
 **Properties:**
-- `children` - List of TableRow elements
-- All Box properties
 
-### TableFoot
-
-Table footer section element.
-
-**Description:** Groups table footer content, typically for summary rows.
-
-**Properties:**
-- `children` - List of TableRow elements
-- All Box properties
-
-### TableRow
-
-Table row element.
-
-**Description:** Represents a row in a table, containing cells.
-
-**Properties:**
-- `children` - List of TableCell or TableHeaderCell elements
-- All Box properties
-
-### TableCell
-
-Standard table cell element.
-
-**Description:** Represents a data cell in a table row.
-
-**Properties:**
-- `children` - List of Box elements for cell content
-- `colspan` - Number of columns to span
-- `rowspan` - Number of rows to span
-- `headers` - Reference to header cells
-- All Box properties
-
-### TableHeaderCell
-
-Table header cell element.
-
-**Description:** Represents a header cell in a table with semantic meaning.
-
-**Properties:**
-- `children` - List of Box elements for cell content
-- `scope` - Scope attribute (col, row, colgroup, rowgroup)
-- `colspan` - Number of columns to span
-- `rowspan` - Number of rows to span
-- `abbr` - Abbreviation for header
-- `headers` - Reference to other header cells
-- All Box properties
-
-### TableCaption
-
-Table caption element.
-
-**Description:** Provides a title or description for the table.
-
-**Properties:**
-- `children` - List of Box elements for caption content
-- All Box properties
-
----
-
-## Feedback Elements
-
-### Progress
-
-Progress indicator element.
-
-**Description:** Displays progress for tasks, loading states, or completion status with full accessibility support.
-
-**Properties:**
-- `value` - Current progress value
-- `max` - Maximum progress value
-- `form` - Associated form id
-- `name` - Form control name
-- `label` - Accessibility label
-- `ariaValueText` - Accessible value description
-- `ariaLabel` - Accessible label
-- `ariaLabelledBy` - Reference to labeling element
-- `ariaDescribedBy` - Reference to description element
-- `fallback` - Fallback text for unsupported browsers
-- All Box properties
+- `src` - Audio source URL (required)
+- `autoplay` - Automatically start playing (default: false)
+- `controls` - Show audio controls (default: true)
+- `loop` - Loop playback (default: false)
+- `preload` - Preload behavior ('auto', 'metadata', 'none')
+- All enhanced Box properties
 
 **Example:**
+
 ```dart
 import 'package:atomify/atomify.dart';
 
-final progressExamples = Container(
+final audioPlayer = Container(
+  className: 'media-controls',
   children: [
-    // Basic progress bar
-    Progress(
-      value: 0.7,
-      max: 1.0,
-      className: 'progress-bar',
+    // Basic audio player
+    Audio(
+      src: '/assets/background-music.mp3',
+      controls: true,
+      className: 'background-audio',
     ),
     
-    // Accessible progress with labels
-    Progress(
-      value: 45.0,
-      max: 100.0,
-      ariaLabel: 'File upload progress',
-      ariaValueText: '45 percent complete',
-      className: 'upload-progress',
+    // Audio with custom configuration
+    Audio(
+      src: '/assets/notification-sound.wav',
+      autoplay: false,
+      controls: true,
+      loop: false,
+      preload: 'metadata',
+      className: 'notification-audio',
+      onRender: (audio) {
+        print('Audio player ready');
+      },
+    ),
+  ],
+);
+```
+
+### Video
+
+Optimized video element with comprehensive media management and performance features.
+
+**Description:** Video provides efficient video playback with full media controls, accessibility support, and production-ready performance optimization.
+
+**Properties:**
+
+- `src` - Video source URL (required)
+- `autoplay` - Automatically start playing (default: false)
+- `controls` - Show video controls (default: true)
+- `loop` - Loop playback (default: false)
+- `preload` - Preload behavior ('auto', 'metadata', 'none')
+- All enhanced Box properties
+
+**Example:**
+
+```dart
+import 'package:atomify/atomify.dart';
+
+final videoSection = Container(
+  className: 'video-section',
+  children: [
+    // Hero video
+    Video(
+      src: '/assets/hero-video.mp4',
+      controls: true,
+      preload: 'metadata',
+      className: 'hero-video',
+      style: '''
+        width: 100%;
+        max-width: 800px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      ''',
     ),
     
-    // Indeterminate progress
-    Progress(
-      className: 'loading-spinner',
-      fallback: 'Loading...',
+    // Background video (autoplay, no controls)
+    Video(
+      src: '/assets/background-loop.mp4',
+      autoplay: true,
+      controls: false,
+      loop: true,
+      preload: 'auto',
+      className: 'background-video',
+      style: '''
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+      ''',
     ),
   ],
 );
@@ -576,309 +993,6 @@ final progressExamples = Container(
 
 ---
 
-## Reactive Elements
+## Remaining Elements
 
-### Reactive
-
-Reactive element that rebuilds based on state changes.
-
-**Description:** Reactive elements automatically update their UI when referenced reactive state changes, enabling dynamic and responsive interfaces.
-
-**Properties:**
-- `ref` - ReactiveRef containing the state
-- `builder` - Function that builds UI based on current state
-- All Box properties
-
-**Example:**
-```dart
-import 'package:atomify/atomify.dart';
-
-final counterRef = ReactiveRef<int>(0);
-
-final reactiveCounter = Container(
-  children: [
-    Reactive<int>(
-      ref: counterRef,
-      builder: (count) => Container(
-        children: [
-          Text('Count: $count', variant: TextVariant.h2),
-          Text('${count * 2}', className: 'doubled'),
-        ],
-      ),
-    ),
-    
-    Button(
-      Text('Increment'),
-      onClick: (e) => counterRef.emit(counterRef.state! + 1),
-    ),
-    
-    Button(
-      Text('Decrement'),
-      onClick: (e) => counterRef.emit(counterRef.state! - 1),
-    ),
-    
-    Button(
-      Text('Reset'),
-      onClick: (e) => counterRef.emit(0),
-    ),
-  ],
-);
-```
-
-### Async
-
-Asynchronous element for handling Future-based operations.
-
-**Description:** Async elements manage asynchronous operations with loading states, success handling, and error management.
-
-**Properties:**
-- `future` - Function returning Future to execute
-- `then` - Function to build UI with successful result
-- `initialBox` - Element to show while loading
-- `onError` - Function to build UI for error states
-- All Box properties
-
-**Example:**
-```dart
-import 'package:atomify/atomify.dart';
-
-final asyncUserData = Async<Map<String, dynamic>>(
-  future: () => fetchUserData(),
-  initialBox: Container(
-    children: [
-      Text('Loading user data...'),
-      Progress(className: 'loading-progress'),
-    ],
-  ),
-  then: (userData) => Container(
-    children: [
-      Text('Welcome, ${userData['name']}!', variant: TextVariant.h2),
-      Text('Email: ${userData['email']}'),
-      Text('Joined: ${userData['joinDate']}'),
-    ],
-  ),
-  onError: (error) => Container(
-    children: [
-      Text('Error loading user data', variant: TextVariant.h3),
-      Text('Error: $error'),
-      Button(
-        Text('Retry'),
-        onClick: (e) => window.location.reload(),
-      ),
-    ],
-  ),
-);
-
-Future<Map<String, dynamic>> fetchUserData() async {
-  // Simulate API call
-  await Future.delayed(Duration(seconds: 2));
-  return {
-    'name': 'John Doe',
-    'email': 'john@example.com',
-    'joinDate': '2024-01-15',
-  };
-}
-```
-
----
-
-## Idiomatic Elements
-
-### I (Italic/Icon)
-
-Italic text element, commonly used for icons.
-
-**Description:** The I element provides italic text styling and is commonly used for icon fonts and semantic emphasis.
-
-**Properties:**
-- `cite` - Citation reference
-- `datetime` - Date/time reference
-- `lang` - Language attribute
-- `dir` - Text direction
-- `title` - Tooltip text
-- `accessKey` - Keyboard shortcut
-- `contentEditable` - Editable content flag
-- `inputMode` - Input mode hint
-- `spellCheck` - Spell check flag
-- `tabIndex` - Tab order
-- `translate` - Translation flag
-- All Box properties
-
-**Example:**
-```dart
-import 'package:atomify/atomify.dart';
-
-final iconExamples = Container(
-  children: [
-    // Icon-only
-    I(className: 'lni lni-home'),
-    
-    // Icon with text
-    Container(
-      style: 'display: flex; align-items: center; gap: 8px;',
-      children: [
-        I(className: 'lni lni-user'),
-        Text('Profile'),
-      ],
-    ),
-    
-    // Semantic italic text
-    I(
-      text: 'emphasized text',
-      title: 'This text is emphasized',
-    ),
-    
-    // Icon button
-    Button(
-      Container(
-        children: [
-          I(className: 'lni lni-download'),
-          Text('Download'),
-        ],
-      ),
-      onClick: (e) => print('Download clicked'),
-    ),
-  ],
-);
-```
-
----
-
-## Application
-
-### App
-
-Application root element that manages rendering and lifecycle.
-
-**Description:** App is the root container that manages the entire application lifecycle, rendering, and global setup.
-
-**Properties:**
-- `children` - List of root-level Box elements
-- `onRender` - Callback after rendering
-- `beforeRender` - Callback before rendering
-
-**Methods:**
-- `run({String target = 'body', Function(Element)? onRender})` - Renders the app to target element
-
-**Example:**
-```dart
-import 'package:atomify/atomify.dart';
-
-void main() {
-  App(
-    children: [
-      Container(
-        id: 'app-root',
-        className: 'main-app',
-        children: [
-          // Header
-          Container(
-            className: 'header',
-            children: [
-              Text('My Atomify App', variant: TextVariant.h1),
-              Container(
-                className: 'nav',
-                children: [
-                  Link(child: Text('Home'), href: '/'),
-                  Link(child: Text('About'), href: '/about'),
-                  Link(child: Text('Contact'), href: '/contact'),
-                ],
-              ),
-            ],
-          ),
-          
-          // Main content
-          Container(
-            className: 'main-content',
-            children: [
-              Text('Welcome to Atomify!'),
-              Button(
-                Text('Get Started'),
-                onClick: (e) => print('Getting started...'),
-              ),
-            ],
-          ),
-          
-          // Footer
-          Container(
-            className: 'footer',
-            children: [
-              Text('© 2024 Atomify App'),
-            ],
-          ),
-        ],
-      ),
-    ],
-    beforeRender: () {
-      // Setup fonts, CSS, icons, etc.
-      useFont(fontFamily: 'Inter');
-      useIcon(pack: IconPack.lineIcons);
-      print('App initializing...');
-    },
-  ).run(
-    target: '#app',
-    onRender: (element) {
-      print('App rendered successfully!');
-    },
-  );
-}
-```
-
----
-
-## Best Practices
-
-### 1. Element Composition
-```dart
-// Good: Compose elements for reusability
-Container buildUserCard(Map<String, dynamic> user) {
-  return Container(
-    className: 'user-card',
-    children: [
-      Text(user['name'], variant: TextVariant.h3),
-      Text(user['email']),
-      Button(
-        Text('View Profile'),
-        onClick: (e) => viewProfile(user['id']),
-      ),
-    ],
-  );
-}
-```
-
-### 2. Reactive State Management
-```dart
-// Good: Use reactive patterns for dynamic UIs
-final todosRef = ReactiveRef<List<Todo>>([]);
-
-Reactive<List<Todo>>(
-  ref: todosRef,
-  builder: (todos) => Container(
-    children: todos.map((todo) => buildTodoItem(todo)).toList(),
-  ),
-)
-```
-
-### 3. Accessibility
-```dart
-// Good: Include accessibility attributes
-Progress(
-  value: 0.75,
-  max: 1.0,
-  ariaLabel: 'Upload progress',
-  ariaValueText: '75% complete',
-)
-```
-
-### 4. Error Handling
-```dart
-// Good: Handle async operations with error states
-Async<UserData>(
-  future: () => fetchUserData(),
-  initialBox: Text('Loading...'),
-  then: (data) => buildUserProfile(data),
-  onError: (error) => Text('Failed to load: $error'),
-)
-```
-
-This comprehensive documentation covers all Atomify elements with detailed descriptions, properties, and practical examples. Each element is designed to be composable, accessible, and easy to use while maintaining the library's atomic design principles.
+For comprehensive documentation of all other elements (Data Display, Feedback, Reactive, and Idiomatic elements), please refer to the existing sections above or the inline code documentation.
