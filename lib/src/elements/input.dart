@@ -33,6 +33,10 @@ class Input extends Box {
 
   late web.HTMLInputElement _element;
 
+  void click() {
+    _element.click();
+  }
+
   @override
   web.HTMLElement render() {
     _element = super.render() as web.HTMLInputElement;
