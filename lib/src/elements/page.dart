@@ -621,6 +621,21 @@ class Page extends Box {
     _isDisposed = true;
     _pageChangeCallbackCalled = false;
 
+    if (id != null) {
+      try {
+        final uri = Uri.parse(web.window.location.href);
+        final combinedParams = Map<String, String>.from(uri.queryParameters);
+        combinedParams.remove(id!);
+
+        final newUri = uri.replace(queryParameters: combinedParams);
+        web.window.history.pushState(null, '', newUri.toString());
+      } catch (e) {
+        if (_kIsDebugMode) {
+          print('Error setting query parameters: $e');
+        }
+      }
+    }
+
     // Call parent dispose
     super.dispose();
   }
