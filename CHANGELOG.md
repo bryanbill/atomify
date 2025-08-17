@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.7+1
+
+- Auto dispose of query parameters in `Page` when the page is disposed
+- Enhanced `Input` element with a `click` method for better interaction
+
 ## 0.1.6
 
 - **O(1) Event Handler Management**: Replaced linear search with HashMap-based event handling for 15-140x performance improvement
