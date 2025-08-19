@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.8+2
+
+- Fixed cached query parameters in `Page`
+
 ## 0.1.7+1
 
 - Auto dispose of query parameters in `Page` when the page is disposed
