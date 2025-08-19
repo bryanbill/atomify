@@ -203,7 +203,6 @@ class Page extends Box {
   bool _pageChangeCallbackCalled = false;
   bool _isDisposed = false;
   View? _currentView;
-  Map<String, String>? _cachedParams;
   int _renderCount = 0;
 
   // Getters
@@ -224,7 +223,6 @@ class Page extends Box {
     this.onPageChange,
   }) : super(tagName: 'div', style: 'height: 100%; width: 100%;') {
     _validateInputs();
-    _initializePage();
   }
 
   /// Validates constructor inputs and throws descriptive errors for invalid values.
@@ -274,36 +272,6 @@ class Page extends Box {
     }
   }
 
-  /// Initializes the page with proper state management
-  void _initializePage() {
-    if (_isDisposed) {
-      throw StateError('Cannot initialize a disposed Page');
-    }
-
-    try {
-      // Cache initial params to avoid repeated parsing
-      _cacheParams();
-    } catch (e) {
-      if (_kIsDebugMode) {
-        print('Error initializing Page: $e');
-      }
-    }
-  }
-
-  /// Caches URL parameters for performance
-  void _cacheParams() {
-    try {
-      final uri = Uri.parse(web.window.location.href);
-      _cachedParams = Map<String, String>.from(uri.queryParameters);
-    } catch (e) {
-      _cachedParams = <String, String>{};
-      if (_kIsDebugMode) {
-        print('Error parsing URL parameters: $e');
-      }
-    }
-  }
-
-  /// Optimized render method with comprehensive error handling and performance monitoring
   @override
   web.HTMLElement render() {
     if (_isDisposed) {
@@ -390,7 +358,6 @@ class Page extends Box {
 
   /// Determines which view should be rendered based on current state
   String _determineViewToRender() {
-    final params = _cachedParams ?? <String, String>{};
     return params[id] ?? initial ?? views.first.id;
   }
 
@@ -409,10 +376,9 @@ class Page extends Box {
   /// Updates URL parameters if necessary
   void _updateUrlIfNeeded(String viewToRender) {
     try {
-      final params = _cachedParams ?? <String, String>{};
+      ;
       if (params[id] == null && id != null) {
         setQueryParams({id!: viewToRender});
-        _cacheParams(); // Refresh cache after update
       }
     } catch (e) {
       if (_kIsDebugMode) {
@@ -426,7 +392,6 @@ class Page extends Box {
     if (_currentView == null) return;
 
     try {
-      final params = _cachedParams ?? <String, String>{};
       final viewElement = _currentView!.render(params);
       _currentView!.element = viewElement;
 
@@ -475,14 +440,9 @@ class Page extends Box {
 
   /// Gets current URL parameters with caching for performance
   Map<String, String> get params {
-    if (_cachedParams != null) {
-      return Map<String, String>.from(_cachedParams!);
-    }
-
     try {
       final uri = Uri.parse(web.window.location.href);
-      _cachedParams = Map<String, String>.from(uri.queryParameters);
-      return Map<String, String>.from(_cachedParams!);
+      return Map<String, String>.from(uri.queryParameters!);
     } catch (e) {
       if (_kIsDebugMode) {
         print('Error getting URL parameters: $e');
@@ -502,9 +462,6 @@ class Page extends Box {
 
       final newUri = uri.replace(queryParameters: combinedParams);
       web.window.history.pushState(null, '', newUri.toString());
-
-      // Update cache
-      _cachedParams = combinedParams;
     } catch (e) {
       if (_kIsDebugMode) {
         print('Error setting query parameters: $e');
@@ -615,8 +572,6 @@ class Page extends Box {
       _PageMutationObserver.unregisterPage(element!);
     }
 
-    // Clear caches and references
-    _cachedParams = null;
     _currentView = null;
     _isDisposed = true;
     _pageChangeCallbackCalled = false;
@@ -649,7 +604,7 @@ class Page extends Box {
       'renderCount': _renderCount,
       'isDisposed': _isDisposed,
       'pageChangeCallbackCalled': _pageChangeCallbackCalled,
-      'cachedParamsCount': _cachedParams?.length ?? 0,
+      'params': params,
     };
   }
 
