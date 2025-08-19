@@ -376,7 +376,6 @@ class Page extends Box {
   /// Updates URL parameters if necessary
   void _updateUrlIfNeeded(String viewToRender) {
     try {
-      ;
       if (params[id] == null && id != null) {
         setQueryParams({id!: viewToRender});
       }
@@ -442,7 +441,7 @@ class Page extends Box {
   Map<String, String> get params {
     try {
       final uri = Uri.parse(web.window.location.href);
-      return Map<String, String>.from(uri.queryParameters!);
+      return Map<String, String>.from(uri.queryParameters);
     } catch (e) {
       if (_kIsDebugMode) {
         print('Error getting URL parameters: $e');
