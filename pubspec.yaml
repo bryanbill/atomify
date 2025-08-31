@@ -7,7 +7,6 @@ repository: https://github.com/bryanbill/atomify
 environment:
   sdk: ^3.7.3
 
-# Add regular dependencies here.
 dependencies:
   web: ^1.1.1
   cssify: ^0.1.0
