@@ -5,7 +5,7 @@ abstract class Ref<T extends Box> {
   T? current;
 
   void dispose() {
-    current?.remove();
+    current?.dispose();
     current = null;
   }
 
