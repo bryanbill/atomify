@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.9+3
+
+- Improved performance of `Box` rendering with memoization
+- Prevent duplicate boxes from being added to the stack
+- Auto dispose boxes using refs
+
 ## 0.1.8+2
 
 - Fixed cached query parameters in `Page`

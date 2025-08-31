@@ -1,7 +1,7 @@
 name: atomify
 description: >
   An idiomatic Dart library for building web applications with a focus on simplicity and reactivity. 
-version: 0.1.8+2
+version: 0.1.9+3
 repository: https://github.com/bryanbill/atomify
 
 environment:
