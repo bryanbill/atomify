@@ -11,12 +11,14 @@ class Option {
 
 class Select extends Box {
   final List<Option> options;
+  final Option? selected;
 
   final void Function(Option)? onOptionSelected;
 
   Select({
     required this.options,
     this.onOptionSelected,
+    this.selected,
     super.ref,
     super.id,
     super.className,
@@ -34,6 +36,12 @@ class Select extends Box {
       final optionElement = HTMLOptionElement()..value = option.value;
       optionElement.append(option.label.render());
       element.append(optionElement);
+    }
+
+    if (selected?.value != null) {
+      if (options.any((option) => option.value == selected!.value)) {
+        element.value = selected!.value;
+      }
     }
 
     element.onchange =

@@ -8,7 +8,7 @@ void main() {
     target: '#output',
     children: [
       Page(
-        id: "dash",
+        id: "views",
         ref: pageRef,
         views: [SplashScreen(), SecondScreen(), TreeScreen()],
         onPageChange: (view) {},
@@ -21,7 +21,7 @@ void main() {
 
 class SplashScreen extends View {
   @override
-  String id = 'screen-splash';
+  String id = 'splash';
 
   @override
   Box render(Map<String, String> params) {
@@ -60,7 +60,7 @@ class SplashScreen extends View {
 
 class SecondScreen extends View {
   @override
-  String id = 'screen-second';
+  String id = 'second';
 
   @override
   Box render(Map<String, String> params) {
@@ -105,7 +105,7 @@ class SecondScreen extends View {
 
 class TreeScreen extends View {
   @override
-  String get id => 'screen-tree';
+  String get id => 'three';
 
   @override
   Box render(Map<String, String> params) {

@@ -19,6 +19,7 @@ This document provides comprehensive documentation for all Atomify elements, inc
   - [Button](#button)
   - [Input](#input)
   - [Link Element](#link)
+  - [Select Element](#select)
 - [Layout Elements](#layout-elements)
   - [Page](#page)
 - [Remaining Elements](#remaining-elements)
@@ -371,15 +372,12 @@ class UserProfileView extends View {
 
   @override
   void beforeRender() {
-    // Optional: Setup or validation before rendering
-    print('Initializing user profile view');
+    // Validate required parameters
+    validateRequiredParams(params, ['userId']);
   }
 
   @override
   Box render(Map<String, String> params) {
-    // Validate required parameters
-    validateRequiredParams(params, ['userId']);
-    
     final userId = params['userId']!;
     final theme = getParam(params, 'theme', 'light');
     
@@ -651,6 +649,42 @@ final navigationLinks = Container(
 ```
 
 ---
+
+### Select
+
+Standard select dropdown component with optimized event handling and accessibility features.
+
+## Properties:
+
+- `options` - List of selectable options (required)
+- `value` - Currently selected value
+- `onChange` - Change event handler (optimized performance)
+- All enhanced Box properties
+
+## Enhanced Features:
+
+- O(1) event handler management for instant updates
+- Comprehensive accessibility support
+- Memory-efficient event handling
+- Production-ready error handling
+
+## Example:
+
+```dart
+import 'package:atomify/atomify.dart';
+
+final selectOptions = [
+  Option(value: 'option1', label: 'Option 1'),
+  Option(value: 'option2', label: 'Option 2'),
+  Option(value: 'option3', label: 'Option 3'),
+];
+
+final selectElement = Select(
+  options: selectOptions,
+  selected: selectedOptions.first,
+  onChange: (e) => print('Selected: ${e.target.value}'),
+);
+```
 
 ## Layout Elements
 
@@ -993,6 +1027,498 @@ final videoSection = Container(
 
 ---
 
-## Remaining Elements
+## State Management
 
-For comprehensive documentation of all other elements (Data Display, Feedback, Reactive, and Idiomatic elements), please refer to the existing sections above or the inline code documentation.
+Atomify provides a comprehensive state management system with reactive components and references for building dynamic, data-driven UIs.
+
+### Reactive
+
+A powerful component for reactive state management that automatically re-renders when state changes.
+
+**Description:** Reactive creates a dynamic UI component that listens to a ReactiveRef and rebuilds its content whenever the state changes. It uses streams for efficient change propagation and includes optimization to prevent unnecessary re-renders when the content hasn't actually changed.
+
+**Properties:**
+
+- `builder` - Function that takes the current state and returns a Box to render (required)
+- `ref` - ReactiveRef that holds the state (required, must be ReactiveRef<T>)
+- All enhanced Box properties
+
+**Performance Features:**
+
+- Automatic change detection via stream subscription
+- Render optimization - skips re-rendering if content hash is unchanged
+- Memory-efficient stream management with proper cleanup
+- Production-ready error handling
+
+**Example:**
+
+```dart
+import 'package:atomify/atomify.dart';
+
+// Create reactive state
+final counterRef = ReactiveRef<int>(0);
+final userRef = ReactiveRef<User?>(null);
+final todoListRef = ReactiveRef<List<Todo>>([]);
+
+// Simple reactive counter
+final reactiveCounter = Reactive<int>(
+  ref: counterRef,
+  builder: (count) => Container(
+    className: 'counter-display',
+    children: [
+      Text('Count: $count', variant: TextVariant.h2),
+      Button(
+        Text('Increment'),
+        onClick: (e) => counterRef.emit(count + 1),
+      ),
+      Button(
+        Text('Decrement'),
+        onClick: (e) => counterRef.emit(count - 1),
+      ),
+    ],
+  ),
+);
+
+// Complex reactive user profile
+final reactiveUserProfile = Reactive<User?>(
+  ref: userRef,
+  builder: (user) {
+    if (user == null) {
+      return Container(
+        className: 'loading-state',
+        children: [
+          Text('Loading user profile...'),
+          Progress(value: null), // Indeterminate progress
+        ],
+      );
+    }
+
+    return Container(
+      className: 'user-profile',
+      children: [
+        Text('Welcome, ${user.name}!', variant: TextVariant.h1),
+        Text('Email: ${user.email}'),
+        Text('Last login: ${user.lastLogin}'),
+        Button(
+          Text('Update Profile'),
+          onClick: (e) => showUpdateDialog(user),
+        ),
+      ],
+    );
+  },
+);
+
+// Reactive todo list with filtering
+final reactiveTaskList = Reactive<List<Todo>>(
+  ref: todoListRef,
+  builder: (todos) {
+    final completedCount = todos.where((t) => t.completed).length;
+    final pendingCount = todos.length - completedCount;
+
+    return Container(
+      className: 'todo-container',
+      children: [
+        Container(
+          className: 'todo-stats',
+          children: [
+            Text('Total: ${todos.length}'),
+            Text('Pending: $pendingCount'),
+            Text('Completed: $completedCount'),
+          ],
+        ),
+        
+        Container(
+          className: 'todo-list',
+          children: todos.map((todo) => Container(
+            className: 'todo-item ${todo.completed ? 'completed' : 'pending'}',
+            children: [
+              Text(todo.title),
+              Button(
+                Text(todo.completed ? 'Undo' : 'Complete'),
+                onClick: (e) => toggleTodo(todo.id),
+              ),
+            ],
+          )).toList(),
+        ),
+        
+        Button(
+          Text('Add Todo'),
+          onClick: (e) => showAddTodoDialog(),
+        ),
+      ],
+    );
+  },
+);
+
+// State management functions
+void updateUser(User newUser) {
+  userRef.emit(newUser, {'source': 'profile_update', 'timestamp': DateTime.now().toString()});
+}
+
+void toggleTodo(String todoId) {
+  final currentTodos = todoListRef.state ?? [];
+  final updatedTodos = currentTodos.map((todo) {
+    if (todo.id == todoId) {
+      return todo.copyWith(completed: !todo.completed);
+    }
+    return todo;
+  }).toList();
+  
+  todoListRef.emit(updatedTodos, {'action': 'toggle', 'todoId': todoId});
+}
+```
+
+### Async
+
+A component for handling asynchronous operations with loading, success, and error states.
+
+**Description:** Async manages asynchronous operations by executing a Future and rendering different UI states based on the operation status. It handles loading states, success results, and error conditions with a clean API for complex async workflows.
+
+**Properties:**
+
+- `future` - Function that returns a Future<T> to execute (required)
+- `then` - Function that takes the resolved data and returns a Box (required)
+- `initialBox` - Box to show while the future is pending (optional)
+- `onError` - Function to handle errors and return error UI (optional)
+- All enhanced Box properties
+
+**Lifecycle:**
+
+1. Renders `initialBox` immediately (if provided)
+2. Executes the `future` function
+3. On success: removes `initialBox`, calls `then` with data, renders result
+4. On error: removes `initialBox`, calls `onError` (if provided), renders error UI
+
+**Example:**
+
+```dart
+import 'package:atomify/atomify.dart';
+
+// Simple async data loading
+final userDataAsync = Async<User>(
+  future: () => fetchUserProfile(userId),
+  initialBox: Container(
+    className: 'loading-container',
+    children: [
+      Progress(value: null),
+      Text('Loading user profile...'),
+    ],
+  ),
+  then: (user) => Container(
+    className: 'user-profile-loaded',
+    children: [
+      Text('Welcome, ${user.name}!', variant: TextVariant.h1),
+      Text('Member since: ${user.joinDate}'),
+      Image(src: user.avatar, alt: '${user.name} avatar'),
+    ],
+  ),
+  onError: (error) => Container(
+    className: 'error-container',
+    children: [
+      Text('Failed to load profile', variant: TextVariant.h2),
+      Text('Error: $error'),
+      Button(
+        Text('Retry'),
+        onClick: (e) => window.location.reload(),
+      ),
+    ],
+  ),
+);
+
+// Complex async operation with multiple states
+final analyticsAsync = Async<AnalyticsData>(
+  future: () => loadAnalyticsData(),
+  initialBox: Container(
+    className: 'analytics-loading',
+    children: [
+      Text('Generating Analytics Report...', variant: TextVariant.h2),
+      Progress(value: null),
+      Text('This may take a few moments'),
+    ],
+  ),
+  then: (analytics) => Container(
+    className: 'analytics-dashboard',
+    children: [
+      Text('Analytics Report', variant: TextVariant.h1),
+      
+      Container(
+        className: 'metrics-grid',
+        children: [
+          MetricCard('Total Users', analytics.totalUsers),
+          MetricCard('Page Views', analytics.pageViews),
+          MetricCard('Conversion Rate', '${analytics.conversionRate}%'),
+          MetricCard('Revenue', '\$${analytics.revenue}'),
+        ],
+      ),
+      
+      Container(
+        className: 'charts-section',
+        children: [
+          ChartComponent(analytics.userGrowthData),
+          ChartComponent(analytics.revenueData),
+        ],
+      ),
+      
+      Button(
+        Text('Export Report'),
+        onClick: (e) => exportAnalytics(analytics),
+      ),
+    ],
+  ),
+  onError: (error) => Container(
+    className: 'analytics-error',
+    children: [
+      Text('Analytics Unavailable', variant: TextVariant.h2),
+      Text('Unable to generate report: $error'),
+      Button(
+        Text('Try Again'),
+        onClick: (e) => refreshAnalytics(),
+      ),
+      Button(
+        Text('Contact Support'),
+        onClick: (e) => openSupportDialog(),
+      ),
+    ],
+  ),
+);
+
+// Async with complex data transformation
+final searchResultsAsync = Async<List<SearchResult>>(
+  future: () => performSearch(searchQuery),
+  initialBox: SearchLoader(),
+  then: (results) {
+    if (results.isEmpty) {
+      return NoResultsFound(searchQuery);
+    }
+    
+    return Container(
+      className: 'search-results',
+      children: [
+        Text('Found ${results.length} results', variant: TextVariant.h3),
+        
+        Container(
+          className: 'results-list',
+          children: results.map((result) => SearchResultCard(result)).toList(),
+        ),
+        
+        if (results.length >= 10)
+          Button(
+            Text('Load More Results'),
+            onClick: (e) => loadMoreResults(),
+          ),
+      ],
+    );
+  },
+  onError: (error) => SearchErrorMessage(error),
+);
+
+// Helper functions for async operations
+Future<User> fetchUserProfile(String userId) async {
+  final response = await api.get('/users/$userId');
+  return User.fromJson(response.data);
+}
+
+Future<AnalyticsData> loadAnalyticsData() async {
+  final [users, views, conversions, revenue] = await Future.wait([
+    api.get('/analytics/users'),
+    api.get('/analytics/pageviews'),
+    api.get('/analytics/conversions'),
+    api.get('/analytics/revenue'),
+  ]);
+  
+  return AnalyticsData(
+    totalUsers: users.data['total'],
+    pageViews: views.data['total'],
+    conversionRate: conversions.data['rate'],
+    revenue: revenue.data['total'],
+  );
+}
+```
+
+## References (Refs)
+
+Atomify uses a reference system for programmatic access to elements and state management.
+
+### ReactiveRef<T>
+
+A reference that holds reactive state and notifies listeners of changes.
+
+**Description:** ReactiveRef is the core of Atomify's reactive state management. It holds a value, provides a stream of changes, and includes metadata support for additional context during state updates.
+
+**Properties:**
+
+- `state` - Current state value (T?)
+- `stream` - Stream<T> for listening to changes
+- `props` - Map<String, dynamic> for additional metadata
+
+**Methods:**
+
+- `emit(T value, [Map<String, dynamic> data])` - Update state and notify listeners
+- `dispose()` - Clean up resources and close stream
+- `init(Box box)` - Initialize with a Box reference
+
+**Example:**
+
+```dart
+// Create reactive state
+final counterRef = ReactiveRef<int>(0);
+final userRef = ReactiveRef<User?>(null);
+final settingsRef = ReactiveRef<AppSettings>(AppSettings.defaults());
+
+// Update state with metadata
+counterRef.emit(5, {'source': 'increment_button', 'timestamp': DateTime.now()});
+userRef.emit(newUser, {'action': 'login', 'method': 'oauth'});
+
+// Listen to state changes
+counterRef.stream.listen((count) {
+  print('Counter updated to: $count');
+  final metadata = counterRef.props;
+  print('Update source: ${metadata['source']}');
+});
+
+// Complex state management
+class TodoStore {
+  final _todosRef = ReactiveRef<List<Todo>>([]);
+  final _filterRef = ReactiveRef<TodoFilter>(TodoFilter.all);
+  
+  ReactiveRef<List<Todo>> get todos => _todosRef;
+  ReactiveRef<TodoFilter> get filter => _filterRef;
+  
+  void addTodo(String title) {
+    final currentTodos = _todosRef.state ?? [];
+    final newTodo = Todo(
+      id: generateId(),
+      title: title,
+      completed: false,
+      createdAt: DateTime.now(),
+    );
+    
+    _todosRef.emit([...currentTodos, newTodo], {
+      'action': 'add',
+      'todoId': newTodo.id,
+    });
+  }
+  
+  void toggleTodo(String id) {
+    final currentTodos = _todosRef.state ?? [];
+    final updatedTodos = currentTodos.map((todo) {
+      if (todo.id == id) {
+        return todo.copyWith(completed: !todo.completed);
+      }
+      return todo;
+    }).toList();
+    
+    _todosRef.emit(updatedTodos, {
+      'action': 'toggle',
+      'todoId': id,
+    });
+  }
+  
+  void setFilter(TodoFilter newFilter) {
+    _filterRef.emit(newFilter, {'previousFilter': filter.state});
+  }
+  
+  void dispose() {
+    _todosRef.dispose();
+    _filterRef.dispose();
+  }
+}
+```
+
+### InputRef
+
+A reference for programmatic control of Input elements.
+
+**Properties:**
+
+- `value` - Get/set the input value
+- `current` - Reference to the Input element
+
+**Methods:**
+
+- `clear()` - Clear the input value
+- `on(Event, callback)` - Add event listener
+- `dispose()` - Clean up and remove element
+
+**Example:**
+
+```dart
+final nameInputRef = InputRef();
+final emailInputRef = InputRef();
+
+final loginForm = Container(
+  children: [
+    Input(
+      ref: nameInputRef,
+      placeholder: 'Enter your name',
+      type: 'text',
+    ),
+    Input(
+      ref: emailInputRef,
+      placeholder: 'Enter your email',
+      type: 'email',
+    ),
+    Button(
+      Text('Submit'),
+      onClick: (e) {
+        final name = nameInputRef.value;
+        final email = emailInputRef.value;
+        
+        if (name?.isNotEmpty == true && email?.isNotEmpty == true) {
+          submitForm(name!, email!);
+          nameInputRef.clear();
+          emailInputRef.clear();
+        }
+      },
+    ),
+  ],
+);
+```
+
+### PageRef
+
+A reference for programmatic page navigation and view management.
+
+**Methods:**
+
+- `push(String viewId, {Map<String, String> params})` - Navigate to a view with parameters
+- `add(Page page)` - Associate a page with this reference
+
+**Example:**
+
+```dart
+final pageRef = PageRef();
+
+// Navigation functions
+void navigateToProfile(String userId) {
+  pageRef.push('profile', params: {'userId': userId});
+}
+
+void navigateToSettings() {
+  pageRef.push('settings');
+}
+
+void navigateHome() {
+  pageRef.push('home');
+}
+
+// Use in page
+final mainPage = Page(
+  ref: pageRef,
+  views: [HomeView(), ProfileView(), SettingsView()],
+  initial: 'home',
+  onPageChange: (view) {
+    print('Navigated to: ${view.id}');
+  },
+);
+```
+
+## State Management Best Practices
+
+1. **Use ReactiveRef for shared state** that multiple components need to access
+2. **Use Async for data fetching** with proper loading and error states
+3. **Combine Reactive and Async** for complex state workflows
+4. **Always dispose of refs** to prevent memory leaks
+5. **Use metadata in emit()** for debugging and analytics
+6. **Keep state immutable** when possible for predictable updates
+
