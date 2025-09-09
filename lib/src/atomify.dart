@@ -20,6 +20,7 @@ export 'elements/pressable/link.dart';
 export 'elements/pressable/button.dart';
 export 'elements/input/input.dart';
 export 'elements/input/select.dart';
+export 'elements/input/textarea.dart';
 export 'elements/layout/page.dart';
 export 'elements/presentation/idiomatic.dart';
 export 'elements/presentation/progress.dart';

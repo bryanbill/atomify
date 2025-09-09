@@ -121,6 +121,16 @@ class _PageMutationObserver {
           try {
             view.applyStyles();
 
+            // Call afterRender lifecycle hook for views that are now in DOM
+            // but may not have had afterRender called yet
+            try {
+              view.afterRender();
+            } catch (e) {
+              if (ownerPage._isDebugMode) {
+                print('Error in afterRender for view ${view.id}: $e');
+              }
+            }
+
             // Remove from pending styles
             _pendingStyleApplication[ownerPage]?.remove(view);
             if (_pendingStyleApplication[ownerPage]?.isEmpty == true) {
@@ -391,6 +401,9 @@ class Page extends Box {
     if (_currentView == null) return;
 
     try {
+      // Call beforeRender lifecycle hook
+      _currentView!.beforeRender();
+
       final viewElement = _currentView!.render(params);
       _currentView!.element = viewElement;
 
@@ -407,6 +420,20 @@ class Page extends Box {
           this,
         );
       }
+
+      // Call afterRender lifecycle hook after DOM is ready
+      // Use a microtask to ensure DOM is fully constructed
+      Future.microtask(() {
+        try {
+          if (!_isDisposed && _currentView != null) {
+            _currentView!.afterRender();
+          }
+        } catch (e) {
+          if (_kIsDebugMode) {
+            print('Error in afterRender for view ${_currentView!.id}: $e');
+          }
+        }
+      });
     } catch (e) {
       if (_kIsDebugMode) {
         print('Error rendering view ${_currentView!.id}: $e');
@@ -500,9 +527,33 @@ class Page extends Box {
       // Update current view before re-rendering
       _currentView = targetView;
 
+      // Call beforeRender for the new view
+      try {
+        _currentView!.beforeRender();
+      } catch (e) {
+        if (_kIsDebugMode) {
+          print('Error in beforeRender for view "$viewId": $e');
+        }
+      }
+
       // Re-render to show new view
       // Styles will be automatically applied via MutationObserver when DOM is updated
       update();
+
+      // Call afterRender after a microtask to ensure DOM is ready
+      Future.microtask(() {
+        try {
+          if (!_isDisposed &&
+              _currentView != null &&
+              _currentView!.id == viewId) {
+            _currentView!.afterRender();
+          }
+        } catch (e) {
+          if (_kIsDebugMode) {
+            print('Error in afterRender for view "$viewId": $e');
+          }
+        }
+      });
     } catch (e) {
       if (_kIsDebugMode) {
         print('Error navigating to view "$viewId": $e');

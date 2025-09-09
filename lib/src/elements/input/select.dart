@@ -45,7 +45,7 @@ class Select extends Box {
     }
 
     element.onchange =
-        (event) {
+        (JSAny event) {
           final selectedOption = options.firstWhere(
             (option) => option.value == element.value,
             orElse: () => options.first,

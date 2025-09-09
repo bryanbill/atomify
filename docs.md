@@ -22,7 +22,9 @@ This document provides comprehensive documentation for all Atomify elements, inc
   - [Select Element](#select)
 - [Layout Elements](#layout-elements)
   - [Page](#page)
-- [Remaining Elements](#remaining-elements)
+- [State](#state)
+  - [Reactive](#reactive)
+  - [Async](#async)
 
 ---
 
@@ -1027,9 +1029,9 @@ final videoSection = Container(
 
 ---
 
-## State Management
+## State
 
-Atomify provides a comprehensive state management system with reactive components and references for building dynamic, data-driven UIs.
+Atomify provides a comprehensive state system with reactive components and references for building dynamic, data-driven UIs.
 
 ### Reactive
 

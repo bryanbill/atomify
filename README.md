@@ -23,7 +23,7 @@ Add Atomify to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  atomify: ^0.1.0
+  atomify: ^latest
 ```
 
 ### Hello World
@@ -31,17 +31,78 @@ dependencies:
 ```dart
 import 'package:atomify/atomify.dart';
 
+final pageRef = PageRef();
+
 void main() {
   App(
+    // Enhanced configuration options
+    developmentMode: true, // Auto-detected in debug builds
+    initializationTimeout: Duration(seconds: 10),
+    target: '#app-root',
+    clearTarget: true,
+    
     children: [
-      Container(
-        children: [
-          Text('Hello, Atomify! 👋'),
+      Page(
+        id: 'main-page',
+        ref: pageRef,
+        views: [
+          HomeView(), 
+          AboutView(), 
+          ContactView()
         ],
+        initial: 'home',
+        onPageChange: (view) {
+          print('Navigated to: ${view.id}');
+        },
       ),
     ],
+    
+    // Lifecycle callbacks with enhanced features
+    beforeRender: () {
+      print('App initializing...');
+      // Setup global styles, fonts, icons
+      useCss(styles: globalStyles);
+    },
+    
+    onRender: (element, appInstance) {
+      print('App rendered successfully!');
+      
+      // Access app performance information in debug mode
+      if (appInstance?.developmentMode == true) {
+        final debugInfo = appInstance!.getDebugInfo();
+        print('Render stats: $debugInfo');
+      }
+    },
+    
+    onError: (error, stackTrace) {
+      print('App error: $error');
+      // Handle errors gracefully - could log to analytics, show user message, etc.
+    },
+    
   ).run();
 }
+
+// Global styles can be applied before rendering
+final globalStyles = [
+  Cssify.create('*', {
+    'base': {
+      'style': {
+        'box-sizing': 'border-box',
+        'margin': '0',
+        'padding': '0',
+      }
+    }
+  }),
+  Cssify.create('body', {
+    'base': {
+      'style': {
+        'font-family': 'Inter, sans-serif',
+        'line-height': '1.6',
+        'color': '#333',
+      }
+    }
+  }),
+];
 ```
 
 ## 🧱 Core Concepts
