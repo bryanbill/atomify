@@ -560,6 +560,46 @@ abstract class Box {
     handler?.cancel();
   }
 
+  /// Add event handler that triggers only once
+  void once(Event event, void Function(web.Event) callback) {
+    void wrapper(web.Event e) {
+      callback(e);
+      off(event);
+    }
+
+    on(event, wrapper);
+  }
+
+  /// Add event listener
+  void addEventListener(
+    String type,
+    web.EventListener listener, [
+    bool? useCapture,
+  ]) {
+    if (_element == null) {
+      throw StateError('Cannot attach event listener to unrendered Box');
+    }
+
+    if (_isDisposed) {
+      if (_kIsDebugMode) {
+        print('Warning: Attempting to add event listener to disposed Box');
+      }
+      return;
+    }
+
+    try {
+      _element!.addEventListener(
+        type,
+        listener,
+        useCapture?.toJS ?? false.toJS,
+      );
+    } catch (e) {
+      if (_kIsDebugMode) {
+        print('Error attaching event listener for $type: $e');
+      }
+    }
+  }
+
   /// Production-ready element replacement with error handling
   void replaceWith(Box newBox) {
     if (_element == null || _isDisposed) {
