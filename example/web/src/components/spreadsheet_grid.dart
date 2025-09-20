@@ -2,6 +2,7 @@ import 'dart:js_interop';
 
 import 'package:atomify/atomify.dart';
 import '../models/cell_data.dart';
+import 'package:web/web.dart' as web;
 
 double savedScrollLeft = 0;
 double savedScrollTop = 0;
@@ -35,7 +36,6 @@ class SpreadsheetGrid extends View {
   Box render(Map<String, String> params) {
     return Container(
       className: 'flex-1 relative',
-
       children: [
         Reactive<SheetsState>(
           ref: stateRef,
@@ -126,6 +126,9 @@ class SpreadsheetGrid extends View {
                   setupScrollSync();
                 },
               ),
+
+              // Single global context menu
+              _buildGlobalContextMenu(),
             ],
           ),
         ),
@@ -187,35 +190,53 @@ class SpreadsheetGrid extends View {
     final textStyle = _buildTextStyle(styles);
 
     return Container(
-      className: 'sheets-cell',
+      className: 'sheets-cell relative',
       style:
-          'width: 80px; height: 32px; min-width: 80px; max-width: 80px; ${cellStyle}',
+          'width: 80px; height: 32px; min-width: 80px; '
+          'max-width: 80px; ${cellStyle}',
       children: [
         Input(
-          type: 'text',
+          type: "text",
           value: cellValue,
           className:
-              'border-0 w-full h-full px-2 text-xs focus:outline-none cursor-cell',
+              'border-0 w-full h-full px-2 text-xs focus:outline-none '
+              'cursor-cell',
           id: 'cell-input-$cellAddress',
           style:
-              '${textStyle} ${_buildInputBackgroundStyle(styles, isSelected, isInRange)}',
+              '$textStyle ${_buildInputBackgroundStyle(styles, isSelected, isInRange)}',
+          attributes: {
+            'title': cellData?.formula.isNotEmpty == true
+                ? cellData!.formula
+                : cellValue,
+            'data-cell': cellAddress,
+          },
           onRender: (input) {
+            // Always set up the context menu handler first
+            input.once(Event.contextMenu, (e) {
+              print(
+                'Context menu triggered for cell: $cellAddress',
+              ); // Debug print
+              e.preventDefault(); // Prevent default browser context menu
+              _showContextMenu(cellAddress, e);
+            });
+
+            // Always set up the click handler
+            input.once(Event.click, (e) {
+              onCellSelect(cellAddress);
+            });
+
+            // Handle active cell specific logic
             if (state.activeCell == cellAddress) {
+              if (cellData != null && cellData.formula.isNotEmpty) {
+                (input.element as HTMLInputElement).value = cellData.formula;
+              }
               input.on(Event.blur, (e) {
                 onCellEdit(
                   cellAddress,
                   (input.element as HTMLInputElement).value,
                 );
-
-                onCellSelect(cellAddress);
               });
-
-              return;
             }
-
-            input.on(Event.click, (e) {
-              onCellSelect(cellAddress);
-            });
           },
         ),
       ],
@@ -435,6 +456,198 @@ class SpreadsheetGrid extends View {
       index ~/= 26;
     }
     return result;
+  }
+
+  /// Build a single global context menu that will be repositioned and shown as needed
+  Box _buildGlobalContextMenu() {
+    return Container(
+      id: "global-context-menu",
+      className:
+          "fixed opacity-0 p-1 "
+          "flex flex-col bg-white border border-gray-300 rounded shadow-lg "
+          "z-[99999999] hidden min-w-[120px]",
+      style: "display: none;",
+      children: [
+        Container(
+          children: [
+            Button(
+              Text('Cut'),
+              className:
+                  'px-4 py-2 hover:bg-gray-100 text-left w-full text-sm rounded-none border-0',
+              onClick: (e) {
+                _onCutCell(_currentContextCellAddress);
+                _hideContextMenu();
+              },
+            ),
+            Button(
+              Text('Copy'),
+              className:
+                  'px-4 py-2 hover:bg-gray-100 text-left w-full text-sm rounded-none border-0',
+              onClick: (e) {
+                _onCopyCell(_currentContextCellAddress);
+                _hideContextMenu();
+              },
+            ),
+            Button(
+              Text('Paste'),
+              className:
+                  'px-4 py-2 hover:bg-gray-100 text-left w-full text-sm rounded-none border-0',
+              onClick: (e) {
+                _onPasteCell(_currentContextCellAddress);
+                _hideContextMenu();
+              },
+            ),
+            Container(className: 'border-t border-gray-200 my-1', children: []),
+            Button(
+              Text('Add Note'),
+              className:
+                  'px-4 py-2 hover:bg-gray-100 text-left w-full text-sm rounded-none border-0',
+              onClick: (e) {
+                _onAddNote(_currentContextCellAddress);
+                _hideContextMenu();
+              },
+            ),
+            Button(
+              Text('Format Cell'),
+              className:
+                  'px-4 py-2 hover:bg-gray-100 text-left w-full text-sm rounded-none border-0',
+              onClick: (e) {
+                _onFormatCell(_currentContextCellAddress);
+                _hideContextMenu();
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // Variable to track which cell the context menu is for
+  String _currentContextCellAddress = '';
+
+  /// Show context menu at mouse position
+  void _showContextMenu(String cellAddress, web.Event event) {
+    print('_showContextMenu called for: $cellAddress'); // Debug print
+
+    // Store the current cell address for the context menu actions
+    _currentContextCellAddress = cellAddress;
+
+    final contextMenu = Stack.find('global-context-menu');
+    print('Found context menu: ${contextMenu != null}'); // Debug print
+
+    if (contextMenu?.element != null) {
+      final mouseEvent = event as web.MouseEvent;
+      final menu = contextMenu!.element!;
+
+      print('Menu element found, showing...'); // Debug print
+
+      // Show the menu by removing hidden class and opacity-0 class
+      menu.classList.remove('hidden');
+      menu.classList.remove('opacity-0');
+      menu.classList.add('opacity-100');
+
+      // Ensure the menu is visible
+      menu.style.display = 'flex';
+
+      // Position the menu at mouse cursor with bounds checking
+      int x = mouseEvent.clientX;
+      int y = mouseEvent.clientY;
+
+      // Simple bounds checking to keep menu on screen
+      final viewportWidth = web.window.innerWidth;
+      final viewportHeight = web.window.innerHeight;
+      final menuWidth = 120; // min-w-[120px]
+      final menuHeight = 200; // estimated height
+
+      if (x + menuWidth > viewportWidth) {
+        x = viewportWidth - menuWidth - 10;
+      }
+      if (y + menuHeight > viewportHeight) {
+        y = viewportHeight - menuHeight - 10;
+      }
+
+      menu.style.position = 'fixed';
+      menu.style.left = '${x}px';
+      menu.style.top = '${y}px';
+      menu.style.zIndex = '99999999';
+
+      print('Menu positioned at: $x, $y'); // Debug print
+    } else {
+      print('Context menu element not found!'); // Debug print
+    }
+  }
+
+  /// Hide the global context menu
+  void _hideContextMenu() {
+    final menu = Stack.find('global-context-menu');
+    if (menu?.element != null) {
+      menu!.element!.classList.add('hidden');
+      menu.element!.classList.remove('opacity-100');
+      menu.element!.classList.add('opacity-0');
+      menu.element!.style.display = 'none';
+    }
+  }
+
+  @override
+  void afterRender() {
+    super.afterRender();
+
+    // Add global click handler to hide context menus when clicking elsewhere
+    web.document.addEventListener(
+      'click',
+      (web.Event event) {
+        final target = event.target as web.Element?;
+
+        // Check if the click is outside any context menu
+        bool isInsideContextMenu = false;
+        if (target != null) {
+          // Check if clicked element or its parents have a context menu id
+          web.Element? current = target;
+          while (current != null) {
+            if (current.id == 'global-context-menu') {
+              isInsideContextMenu = true;
+              break;
+            }
+            current = current.parentElement;
+          }
+        }
+
+        if (!isInsideContextMenu) {
+          _hideContextMenu();
+        }
+      }.toJS,
+    );
+  }
+
+  /// Context menu actions - these can be expanded with actual functionality
+  void _onCutCell(String cellAddress) {
+    print('Cut cell: $cellAddress');
+    // TODO: Implement cut functionality
+    // This would involve copying the cell value and then clearing it
+  }
+
+  void _onCopyCell(String cellAddress) {
+    print('Copy cell: $cellAddress');
+    // TODO: Implement copy functionality
+    // This would copy the cell value to clipboard or internal storage
+  }
+
+  void _onPasteCell(String cellAddress) {
+    print('Paste to cell: $cellAddress');
+    // TODO: Implement paste functionality
+    // This would paste from clipboard or internal storage to the cell
+  }
+
+  void _onAddNote(String cellAddress) {
+    print('Add note to cell: $cellAddress');
+    // TODO: Implement add note functionality
+    // This could open a modal or inline editor for adding notes
+  }
+
+  void _onFormatCell(String cellAddress) {
+    print('Format cell: $cellAddress');
+    // TODO: Implement format cell functionality
+    // This could open a formatting dialog or panel
   }
 
   @override

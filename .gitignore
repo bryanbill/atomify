@@ -10,3 +10,5 @@ ROADMAP*
 
 example/docs
 example/sfa
+example/
+.github/*.md

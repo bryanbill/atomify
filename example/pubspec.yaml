@@ -10,6 +10,7 @@ publish_to: none
 dependencies:
   atomify:
     path: ../
+  http: ^1.5.0
   idb_shim: ^2.4.1+1
 
 dev_dependencies:

@@ -2,7 +2,7 @@ import 'dart:js_interop';
 
 import 'package:atomify/atomify.dart';
 import '../services/custom_functions.dart';
-import '../services/function_language.dart';
+import '../services/language/slang.dart';
 
 class CodeEditorModal extends View {
   final ReactiveRef<bool> isVisibleRef;
@@ -155,7 +155,7 @@ return result;''';
 
       final testCells = <String, String>{'A1': '100', 'B1': '200'};
 
-      final result = FunctionLanguage.runCode(functionBody, [
+      final result = Slang.run(functionBody, [
         '100',
         '200',
       ], testCells);

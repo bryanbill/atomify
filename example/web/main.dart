@@ -1,6 +1,8 @@
+import 'dart:js_interop';
+
 import 'package:atomify/atomify.dart';
 import 'src/sheets.dart';
-
+import 'package:web/web.dart' as web;
 final pageRef = PageRef();
 void main() {
   App(
@@ -28,6 +30,14 @@ void main() {
         onRender: (e) {},
       ),
     ],
-    onRender: (element, instance) {},
+    onRender: (element, instance) {
+      // disable context menu
+      element.addEventListener(
+        'contextmenu',
+        (web.Event e) {
+         e.preventDefault();
+        }.toJS,
+      );
+    },
   ).run();
 }

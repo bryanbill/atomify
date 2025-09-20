@@ -1,5 +1,6 @@
 /// Custom Function Definition and Management
-import 'function_language.dart';
+import 'language/slang.dart';
+import 'storage/sheets_storage.dart';
 
 class CustomFunction {
   final String source;
@@ -42,38 +43,48 @@ class CustomFunctionManager {
   /// Load custom functions from storage
   static Future<void> loadFunctions() async {
     try {
-      // In a real app, load from localStorage or IndexedDB
-      // For now, we'll use in-memory storage with some defaults
-      _addDefaultFunctions();
+      final storedFunctions = await SheetsStorage.loadAllFunctions();
+      _functions.clear();
+
+      for (final functionData in storedFunctions) {
+        final function = CustomFunction.fromJson(functionData);
+        _functions[functionData['name'].toString().toUpperCase()] = function;
+      }
+
+      // Add default functions if none exist
+      if (_functions.isEmpty) {
+        await _addDefaultFunctions();
+      }
     } catch (e) {
       print('Error loading custom functions: $e');
+      await _addDefaultFunctions();
     }
   }
 
   /// Save custom functions to storage
   static Future<void> saveFunctions() async {
     try {
-      // In a real app, save to localStorage or IndexedDB
-      final functionsJson = _functions.map(
-        (key, value) => MapEntry(key, value.toJson()),
-      );
-      print('Saving ${functionsJson.length} custom functions');
+      for (final entry in _functions.entries) {
+        await SheetsStorage.saveFunction(entry.key, entry.value.toJson());
+      }
+      print('Saved ${_functions.length} custom functions');
     } catch (e) {
       print('Error saving custom functions: $e');
     }
   }
 
   /// Add or update a custom function
-  static void addFunction(String name, CustomFunction function) {
+  static Future<void> addFunction(String name, CustomFunction function) async {
     _functions[name.toUpperCase()] = function;
-    saveFunctions();
+    await SheetsStorage.saveFunction(name.toUpperCase(), function.toJson());
   }
 
   /// Remove a custom function
-  static bool removeFunction(String name) {
-    final removed = _functions.remove(name.toUpperCase()) != null;
+  static Future<bool> removeFunction(String name) async {
+    final upperName = name.toUpperCase();
+    final removed = _functions.remove(upperName) != null;
     if (removed) {
-      saveFunctions();
+      await SheetsStorage.deleteFunction(upperName);
     }
     return removed;
   }
@@ -103,7 +114,7 @@ class CustomFunctionManager {
     }
     // Try parsing
     try {
-      FunctionLanguage.parseFunction(source);
+      Slang.parseFunction(source);
       return true;
     } catch (e) {
       return false;
@@ -121,117 +132,27 @@ class CustomFunctionManager {
       throw Exception('Function $name not found');
     }
     try {
-      return FunctionLanguage.runCode(function.source, arguments, cellValues);
+      return Slang.run(function.source, arguments, cellValues);
     } catch (e) {
       throw Exception('Error executing function $name: $e');
     }
   }
 
-  /// Simple function interpreter (supports basic operations)
-  static dynamic _interpretFunction(String body, Map<String, dynamic> context) {
-    // This is a simplified interpreter. In a real implementation,
-    // you might want to use a proper JS engine or expression evaluator
-
-    // For demo purposes, we'll handle simple cases
-    final lines = body
-        .split('\n')
-        .map((line) => line.trim())
-        .where((line) => line.isNotEmpty)
-        .toList();
-
-    dynamic result;
-    for (String line in lines) {
-      if (line.startsWith('return ')) {
-        String expression = line.substring(7).replaceAll(';', '').trim();
-        result = _evaluateExpression(expression, context);
-        break;
-      }
-      // Handle variable assignments if needed
-    }
-
-    return result ?? 0;
-  }
-
-  /// Evaluate simple expressions
-  static dynamic _evaluateExpression(
-    String expression,
-    Map<String, dynamic> context,
-  ) {
-    // Replace variables with their values
-    String processed = expression;
-
-    // Replace parameter names with their values
-    context.forEach((key, value) {
-      if (value is! Function) {
-        processed = processed.replaceAll(
-          RegExp('\\b$key\\b'),
-          value.toString(),
-        );
-      }
-    });
-
-    // Handle function calls like SUM(a, b, c)
-    processed = processed.replaceAllMapped(RegExp(r'(\w+)\(([^)]*)\)'), (
-      match,
-    ) {
-      String funcName = match.group(1)!;
-      String argsStr = match.group(2)!;
-
-      if (context.containsKey(funcName) && context[funcName] is Function) {
-        List<String> args = argsStr.split(',').map((s) => s.trim()).toList();
-        List<dynamic> values = args
-            .map((arg) => double.tryParse(arg) ?? arg)
-            .toList();
-        return context[funcName](values).toString();
-      }
-      return match.group(0)!;
-    });
-
-    // Simple arithmetic evaluation
-    try {
-      return double.tryParse(processed) ?? processed;
-    } catch (e) {
-      return processed;
-    }
-  }
-
-  static bool _isReservedName(String name) {
-    final reserved = {
-      'SUM',
-      'AVG',
-      'MAX',
-      'MIN',
-      'COUNT',
-      'IF',
-      'AND',
-      'OR',
-      'NOT',
-      'CELL',
-      'ROW',
-      'COLUMN',
-      'INDEX',
-      'MATCH',
-      'VLOOKUP',
-      'HLOOKUP',
-    };
-    return reserved.contains(name.toUpperCase());
-  }
-
-  static void _addDefaultFunctions() {
-    addFunction(
+  static Future<void> _addDefaultFunctions() async {
+    await addFunction(
       'DOUBLE',
       CustomFunction(
         source: 'declare DOUBLE;\naccepts value;\nreturn value * 2;',
       ),
     );
-    addFunction(
+    await addFunction(
       'PERCENTAGE',
       CustomFunction(
         source:
             'declare PERCENTAGE;\naccepts part, whole;\nreturn (part / whole) * 100;',
       ),
     );
-    addFunction(
+    await addFunction(
       'COMPOUND_INTEREST',
       CustomFunction(
         source:
